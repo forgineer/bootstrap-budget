@@ -1,2 +1,2 @@
 # bootstrap-budget
-A simple checkbook and budget application to help you pull your budget up by it's bootstraps
+A simple checkbook and budget application to help you pull your budget up by its bootstraps
