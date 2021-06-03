@@ -1,0 +1,4 @@
+{
+    "admin_password": "foobar",
+    "local_db_dir": "../data"
+}

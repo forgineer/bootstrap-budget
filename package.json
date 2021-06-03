@@ -1,8 +1,17 @@
 {
     "name": "bootstrap-budget",
     "version": "1.0.0",
-    "keywords": ["util", "functional", "server", "client", "browser"],
-    "author": "Blake Phillips (baphil8649)",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "Blake Phillips (forgineer)",
     "contributors": [],
-    "dependencies": {}
+    "dependencies": {
+        "express": "^4.17.1",
+        "sqlite3": "^5.0.2"
+    }
 }

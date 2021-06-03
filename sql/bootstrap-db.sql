@@ -1,3 +1,0 @@
--- As ROOT...
-CREATE DATABASE bootstrap;
--- SHOW CREATE DATABASE bootstrap;
