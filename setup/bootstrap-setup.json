@@ -1,4 +1,13 @@
 {
-    "admin_password": "foobar",
-    "local_db_dir": "../data"
+    "admin_password": "bootstrap"
+    , "service_username": "usern@me"
+    , "service_password": "passwd"
+    , "service_url": "localhost"
+    , "service_port": "8081"
+    , "db_server": "sqlite"
+    , "db_name": "BOOTSTRAP"
+    , "db_username": "usern@me"
+    , "db_password": "passwd"
+    , "db_url": "localhost"
+    , "db_port": "9999"
 }

@@ -10,7 +10,7 @@ CREATE TABLE ACCOUNT (
 	account_nbr TEXT(50),
 	route_nbr TEXT(50),
 	user_id INTEGER NOT NULL,
-	permissions NUMERIC NOT NULL,
-	create_dttm TEXT(30) NOT NULL,
-	active_ind NUMERIC DEFAULT 1 NOT NULL
+	create_dt_tm REAL NOT NULL,
+	create_iso_ts TEXT(30) NOT NULL,
+	active_ind INTEGER DEFAULT 1 NOT NULL
 );
