@@ -8,6 +8,8 @@ CREATE TABLE "TRANSACTION" (
 	transaction_desc TEXT(200),
 	transaction_norm TEXT(200),
 	transaction_amt REAL DEFAULT 0 NOT NULL,
+	transaction_year INTEGER NOT NULL,
+	transaction_month INTEGER NOT NULL,
 	transaction_dt_tm REAL NOT NULL,
 	transaction_iso_ts TEXT(30) NOT NULL,
 	transaction_note TEXT(500),
@@ -16,5 +18,7 @@ CREATE TABLE "TRANSACTION" (
 	user_id INTEGER NOT NULL,
 	create_dt_tm REAL NOT NULL,
 	create_iso_ts TEXT(30) NOT NULL,
+	updt_dt_tm REAL NOT NULL,
+	updt_iso_ts TEXT(30) NOT NULL,
 	active_ind INTEGER DEFAULT 1 NOT NULL
 );

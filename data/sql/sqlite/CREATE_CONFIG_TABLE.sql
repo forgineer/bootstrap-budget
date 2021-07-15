@@ -9,9 +9,11 @@ CREATE TABLE CONFIG (
 	config_value_int INTEGER,
 	config_value_flt REAL,
 	config_value_txt TEXT(100),
-	config_value_set INTEGER DEFAULT 1 NOT NULL,
+	config_value_set INTEGER DEFAULT 0 NOT NULL,
 	user_id INTEGER NOT NULL,
 	create_dt_tm REAL NOT NULL,
 	create_iso_ts TEXT(30) NOT NULL,
+	updt_dt_tm REAL NOT NULL,
+	updt_iso_ts TEXT(30) NOT NULL,
 	active_ind INTEGER DEFAULT 1 NOT NULL
 );

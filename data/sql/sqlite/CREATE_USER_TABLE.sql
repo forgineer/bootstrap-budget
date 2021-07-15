@@ -8,7 +8,7 @@ CREATE TABLE "USER" (
 	last_name TEXT(100) NOT NULL,
 	first_name TEXT(100) NOT NULL,
 	middle_name TEXT(100),
-	login TEXT(40) NOT NULL,
+	username TEXT(40) NOT NULL,
 	address_line_1 TEXT(100),
 	address_line_2 TEXT(100),
 	city TEXT(100),
@@ -19,7 +19,11 @@ CREATE TABLE "USER" (
 	admin_ind INTEGER DEFAULT 0 NOT NULL,
 	hash TEXT(50),
 	salt TEXT(50),
+	tutorial_ind INTEGER DEFAULT 1,
+	admin_ind INTEGER DEFAULT 0 NOT NULL,
 	create_dt_tm REAL NOT NULL,
 	create_iso_ts TEXT(30) NOT NULL,
+	updt_dt_tm REAL NOT NULL,
+	updt_iso_ts TEXT(30) NOT NULL,
 	active_ind INTEGER DEFAULT 1 NOT NULL
 );
