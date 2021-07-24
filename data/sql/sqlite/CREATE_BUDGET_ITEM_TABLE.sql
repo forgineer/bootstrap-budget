@@ -5,7 +5,7 @@
  */
 CREATE TABLE BUDGET_ITEM (
 	budget_item_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	budget_id INTEGER NOT NULL
+	budget_id INTEGER NOT NULL,
 	budget_item_name TEXT(100) NOT NULL,
 	budget_item_desc TEXT(200),
 	budget_item_amt REAL DEFAULT 0 NOT NULL,
