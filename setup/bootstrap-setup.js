@@ -15,6 +15,7 @@ var curDate = new Date();
 var curTime = curDate.getTime();
 var curIso = curDate.toISOString();
 
+
 let config = {
     "os_type": os.type,
     "db_name": "BOOTSTRAP",
@@ -34,37 +35,7 @@ var tableBuildList = [
 ];
 
 
-
-const bootstrapSetup = async () => {
-    const prompts = await inqirePrompts();
-    //const db1 = await sqliteSetup(prompts);
-}
-
-
-const promiseToDoSomething = () => {
-    return new Promise(resolve => {
-      setTimeout(() => resolve('I did something'), 10000)
-    })
-  }
-  
-  const watchOverSomeoneDoingSomething = async () => {
-    const something = await promiseToDoSomething()
-    return something + '\nand I watched'
-  }
-  
-  const watchOverSomeoneWatchingSomeoneDoingSomething = async () => {
-    const something = await watchOverSomeoneDoingSomething()
-    return something + '\nand I watched as well'
-  }
-  
-  watchOverSomeoneWatchingSomeoneDoingSomething().then(res => {
-    console.log(res)
-  })
-
-
-
-
-function inqirePrompts() {
+let bootstrapSetup = new Promise(function(resolve, reject) {
 
     function setConfigObj(name, value) {
         config[name] = value;
@@ -94,7 +65,7 @@ function inqirePrompts() {
                 //console.log(config);
                 inqireServices ();
             } else {
-                inqireDBAttributes (answers.db_service);
+                inqireDBAttributes(answers.db_service);
             }
         });
     }
@@ -114,7 +85,6 @@ function inqirePrompts() {
                 dbPort = '5432';
                 break;
         }
-    
 
         inquirer.prompt([
             {
@@ -148,7 +118,7 @@ function inqirePrompts() {
             inqireServices();
         });
     }
-    
+
 
     function inqireServices() {
         inquirer.prompt([
@@ -173,31 +143,47 @@ function inqirePrompts() {
     }
 
 
-    function inquireAdmin () {
+    function inquireAdmin() {
         inquirer.prompt([
             {
                 type: 'password',
                 name: 'admin_password',
                 message: 'Enter Bootstrap administrator password:',
-                default: 'bootstrap',
+            },
+            {
+                type: 'password',
+                name: 'password_check',
+                message: 'Re-enter Bootstrap administrator password:',
             },
         ]).then((answers) => {
-            setConfigObj(Object.keys(answers)[0], answers.admin_password);
-            console.log(JSON.stringify(config, null, '  '));
+            if(answers.admin_password == answers.password_check) {
+                setConfigObj(Object.keys(answers)[0], answers.admin_password);
+                console.log(JSON.stringify(config, null, '  '));
+                resolve();
+            } else {
+                inquireAdmin();
+            }
         });
     }
 
-    inqireDBService(); // Start
-}
+    inqireDBService();  // Start
+}); // End bootstrapSetup
 
 
+function sqliteSetup() {
 
-function sqliteSetup(nullParam) {
+    const sqlite3 = require('sqlite3').verbose();
+    var db = new sqlite3.Database(path.join(__dirname, "../data/" + config.db_name));
+    let adminId;
+
+    createTables(); // Start
+
 
     function setAdminId(id) {
         adminId = id;
         console.log("Admin ID: " + adminId);
     }
+
 
     function createTables() {
         for(table in tableBuildList) {
@@ -231,8 +217,7 @@ function sqliteSetup(nullParam) {
             db.serialize(function() {
                 db.run(sql, 'ADMIN', 'ADMIN', '', 'ADMIN', '', '', '', '', '', '', '', hash, salt, 0, 1, curTime, curIso, curTime, curIso, 1, 
                     function(err) {
-                        //setAdminId(this.lastID);
-                        postConfig(this.lastID);
+                        setAdminId(this.lastID);
                     }
                 );
             });
@@ -241,7 +226,7 @@ function sqliteSetup(nullParam) {
             exitWithError("INSERT_USER.sql does NOT exists in sql dir. Exiting...");
         }
 
-
+        setTimeout(function(){ postConfig(adminId); }, 1000);
     }
 
 
@@ -268,17 +253,12 @@ function sqliteSetup(nullParam) {
         } else {
             exitWithError("INSERT_CONFIG.sql does NOT exists in sql dir. Exiting...");
         }
-
     }
 
-    const sqlite3 = require('sqlite3').verbose();
-    var db = new sqlite3.Database(path.join(__dirname, "../data/" + config.db_name));
-    let adminId;
+    //db.close();
 
-    createTables(); // Start
+}   // End sqliteSetup
 
-    db.close();
-}
 
 //function mariadbSetup () {}
 //function mysqlSetup () {}
@@ -291,6 +271,9 @@ function exitWithError(errString) {
 }
 
 
-bootstrapSetup();
+bootstrapSetup.then(
+    function() { sqliteSetup(); },
+    function() { console.log("Failed at first step!"); }
+);
 
 //console.log("The End!");
