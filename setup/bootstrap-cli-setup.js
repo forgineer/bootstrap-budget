@@ -1,6 +1,6 @@
 /**
- * Name: bootstrap-setup.js
- * Purpose: Initialize the Bootstrap-Budget DB and configurations
+ * Name: bootstrap-cli-setup.js
+ * Purpose: Initialize the Bootstrap-Budget DB and Configurations over CLI
  * Author: Blake Phillips (forgineer)
  */
 
@@ -59,7 +59,8 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
         ).then((answers) => {
             //console.log(answers);
             //console.log(Object.keys(answers)[0]);
-            setConfigObj(Object.keys(answers)[0], answers.db_service);
+            //setConfigObj(Object.keys(answers)[0], answers.db_service);
+            config.db_service = answers.db_service;
 
             if(answers.db_service == "sqlite") {
                 //console.log(config);
@@ -110,10 +111,14 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
                 default: dbPort,
             },
         ]).then((answers) => {
-            setConfigObj(Object.keys(answers)[0], answers.db_username);
-            setConfigObj(Object.keys(answers)[1], answers.db_password);
-            setConfigObj(Object.keys(answers)[2], answers.db_address);
-            setConfigObj(Object.keys(answers)[3], answers.db_port);
+            //setConfigObj(Object.keys(answers)[0], answers.db_username);
+            //setConfigObj(Object.keys(answers)[1], answers.db_password);
+            //setConfigObj(Object.keys(answers)[2], answers.db_address);
+            //setConfigObj(Object.keys(answers)[3], answers.db_port);
+            config.db_username = answers.db_username;
+            config.db_password = answers.db_password;
+            config.db_address = answers.db_address
+            config.db_port = answers.db_port;
 
             inqireServices();
         });
@@ -135,8 +140,10 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
                 default: '8080',
             },
         ]).then((answers) => {
-            setConfigObj(Object.keys(answers)[0], answers.services_address);
-            setConfigObj(Object.keys(answers)[1], answers.services_port);
+            //setConfigObj(Object.keys(answers)[0], answers.services_address);
+            //setConfigObj(Object.keys(answers)[1], answers.services_port);
+            config.services_address = answers.services_address;
+            config.services_port = answers.services_port;
 
             inquireAdmin();
         });
@@ -157,7 +164,8 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
             },
         ]).then((answers) => {
             if(answers.admin_password == answers.password_check) {
-                setConfigObj(Object.keys(answers)[0], answers.admin_password);
+                //setConfigObj(Object.keys(answers)[0], answers.admin_password);
+                config.admin_password = answers.admin_password;
                 console.log(JSON.stringify(config, null, '  '));
                 resolve();
             } else {
@@ -167,6 +175,7 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
     }
 
     inqireDBService();  // Start
+
 }); // End bootstrapSetup
 
 
@@ -176,19 +185,20 @@ function sqliteSetup() {
     var db = new sqlite3.Database(path.join(__dirname, "../data/" + config.db_name));
     let adminId;
 
-    createTables(); // Start
-
 
     function setAdminId(id) {
         adminId = id;
-        console.log("Admin ID: " + adminId);
+        //console.log("Admin ID: " + adminId);
     }
 
 
     function createTables() {
+        var createAction;
+
         for(table in tableBuildList) {
             if(fs.existsSync(path.join(__dirname, "../data/sql/sqlite", tableBuildList[table]))) {
-                console.log(tableBuildList[table] + " exists. Building...");
+                createAction = tableBuildList[table].split(".");
+                console.log(createAction[0]);
             
                 var sql = fs.readFileSync(path.join(__dirname, "../data/sql/sqlite", tableBuildList[table]), { encoding:'utf8', flag:'r' },
                     function(err, sql) { if(err) { console.log(err); } }
@@ -197,16 +207,18 @@ function sqliteSetup() {
                 db.serialize(function() { db.run(sql) });
                 
             } else {
-                exitWithError(tableBuildList[table] + " does NOT exists in sql dir. Exiting...");
+                console.log(tableBuildList[table] + " does NOT exists in sql dir. Exiting...");
             }
         }
 
-        adminConfig();
+        setTimeout(function(){ adminConfig(); }, 1000);
     }
     
 
     function adminConfig() {
         if(fs.existsSync(path.join(__dirname, "../data/sql/sqlite/INSERT_USER.sql"))) {
+            console.log("Posting ADMIN account...");
+
             var sql = fs.readFileSync(path.join(__dirname, "../data/sql/sqlite/INSERT_USER.sql"), { encoding:'utf8', flag:'r' },
                 function(err, sql) { if(err) { console.log(err); } }
             );
@@ -223,7 +235,7 @@ function sqliteSetup() {
             });
 
         } else {
-            exitWithError("INSERT_USER.sql does NOT exists in sql dir. Exiting...");
+            console.log("INSERT_USER.sql does NOT exists in sql dir. Exiting...");
         }
 
         setTimeout(function(){ postConfig(adminId); }, 1000);
@@ -232,48 +244,34 @@ function sqliteSetup() {
 
     function postConfig(adminId) {
         if(fs.existsSync(path.join(__dirname, "../data/sql/sqlite/INSERT_CONFIG.sql"))) {
+            console.log("Posting CONFIG...");
+
             var sql = fs.readFileSync(path.join(__dirname, "../data/sql/sqlite/INSERT_CONFIG.sql"), { encoding:'utf8', flag:'r' },
                 function(err, sql) { if(err) { console.log(err); } }
             );
     
             db.serialize(function() { 
                 //(config_text, config_value_int, config_value_flt, config_value_txt, config_value_set, user_id, create_dt_tm, create_iso_ts, updt_dt_tm, updt_iso_ts, active_ind)
-                db.run(sql, 'os_type', 0, 0, config.os_type, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                db.run(sql, 'db_service', 0, 0, config.db_service, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                db.run(sql, 'db_name', 0, 0, config.db_name, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                if(config.db_service == "sqlite") {
-                    db.run(sql, 'db_username', 0, 0, config.db_username, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                    db.run(sql, 'db_address', 0, 0, config.db_address, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                    db.run(sql, 'db_port', 0, 0, config.db_port, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                }
-                db.run(sql, 'services_address', 0, 0, config.services_address, 3, adminId, curTime, curIso, curTime, curIso, 1);
-                db.run(sql, 'services_port', 0, 0, config.services_port, 3, adminId, curTime, curIso, curTime, curIso, 1);
+
+                for (const [key, value] of Object.entries(config)) {
+                    //console.log(`${key}: ${value}`);
+                    db.run(sql, `${key}`, 0, 0, `${value}`, 3, adminId, curTime, curIso, curTime, curIso, 1);
+                  }
             });
     
         } else {
-            exitWithError("INSERT_CONFIG.sql does NOT exists in sql dir. Exiting...");
+            console.log("INSERT_CONFIG.sql does NOT exists in sql dir. Exiting...");
         }
+
+        setTimeout(function(){ db.close(); console.log("The End!"); }, 1000);
     }
 
-    //db.close();
+    createTables(); // Start
 
-}   // End sqliteSetup
-
-
-//function mariadbSetup () {}
-//function mysqlSetup () {}
-//function startServices () {}
+};   // End sqliteSetup
 
 
-function exitWithError(errString) {
-    console.log(errString);
-    process.exit(0);
-}
-
-
-bootstrapSetup.then(
+bootstrapSetup.then(    // Start Setup
     function() { sqliteSetup(); },
-    function() { console.log("Failed at first step!"); }
+    function(err) { console.log(err) }
 );
-
-//console.log("The End!");

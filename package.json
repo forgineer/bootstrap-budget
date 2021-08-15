@@ -13,11 +13,13 @@
     "dependencies": {
         "bcrypt": "^5.0.1",
         "express": "^4.17.1",
+        "forever": "^4.0.1",
         "inquirer": "^8.1.2",
         "mariadb": "^2.5.4",
         "sqlite3": "^5.0.2"
     },
     "scripts": {
-        "setup": "node setup/bootstrap-setup.js"
+        "setup-cli": "node setup/bootstrap-cli-setup.js",
+        "setup-web": "node setup/bootstrap-web-setup.js"
     }
 }
