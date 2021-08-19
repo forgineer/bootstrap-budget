@@ -16,7 +16,8 @@
         "forever": "^4.0.1",
         "inquirer": "^8.1.2",
         "mariadb": "^2.5.4",
-        "sqlite3": "^5.0.2"
+        "sqlite3": "^5.0.2",
+        "winston": "^3.3.3"
     },
     "scripts": {
         "setup-cli": "node setup/bootstrap-cli-setup.js",
