@@ -75,7 +75,7 @@
                 formArray.push("<input type='password' class='form-control' id='adminPasswdCheck' aria-describedby='bootstrapServices' placeholder=''>");
                 formArray.push("</div>");
 
-                formArray.push("<button type='submit' class='btn btn-primary'>Submit</button>");
+                formArray.push("<button type='button' class='btn btn-primary' id='submitBtn'>Submit</button>");
                 formArray.push("</form>");
 
                 $("#setup-bootstrap-jumbo").html(formArray.join(""));
@@ -104,9 +104,50 @@
                 }
             });
 
-            $(document).on('submit', function() {
-                alert($('input[name="dbService"]').val());
+            $(document).on('click', '#submitBtn', function() {
+                // Establish config object
+                let config = {
+                    "db_name": "BOOTSTRAP",
+                };
+
+                config.db_service = $('input[name="dbService"]').val();
+                config.services_address = $('input[id="apiAddress"]').attr("placeholder");
+                config.services_port = $('input[id="apiPort"]').attr("placeholder");
+
+                /*
+                if(config.db_service == "mariadb") {
+                            config.db_username = answers.db_username;
+                            config.db_password = answers.db_password;
+                            config.db_address = answers.db_address;
+                            config.db_port = answers.db_port;
+                        }
+
+                */
+
+                if($('input[id="apiAddress"]').val().length > 0) {
+                    config.services_address = $('input[id="apiAddress"]').val();
+                }
+
+                if($('input[id="apiPort"]').val().length > 0) {
+                    config.services_port = $('input[id="apiPort"]').val();
+                }
+
+                if($('input[id="adminPasswd"], input[id="adminPasswdCheck').val().length == 0) {
+                    alert("Password MUST be provided!");
+                } else {
+                    if($('input[id="adminPasswd"]').val() != $('input[id="adminPasswdCheck"]').val()) {
+                        alert("Passwords do NOT match. Please enter matching passwords.");
+                    } else {
+                        config.admin_password = $('input[id="adminPasswd"]').val();
+
+                        //alert(JSON.stringify(config));
+                        var postConfg = $.post('http://localhost:8081/bootstrap/setup/sqlite', config);
+                        postConfg.done(function(data) { alert(JSON.stringify(data)); });
+                        postConfg.fail(function() { alert("Fail!"); });
+                    }
+                }
             });
+
         </script>
 
     </head>

@@ -117,7 +117,7 @@ let bootstrapSetup = new Promise(function(resolve, reject) {
             //setConfigObj(Object.keys(answers)[3], answers.db_port);
             config.db_username = answers.db_username;
             config.db_password = answers.db_password;
-            config.db_address = answers.db_address
+            config.db_address = answers.db_address;
             config.db_port = answers.db_port;
 
             inqireServices();

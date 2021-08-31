@@ -12,6 +12,7 @@
     "contributors": [],
     "dependencies": {
         "bcrypt": "^5.0.1",
+        "cors": "^2.8.5",
         "express": "^4.17.1",
         "forever": "^4.0.1",
         "inquirer": "^8.1.2",
@@ -21,6 +22,8 @@
     },
     "scripts": {
         "setup-cli": "node setup/bootstrap-cli-setup.js",
-        "setup-web": "node setup/bootstrap-web-setup.js"
+        "setup-web": "node setup/bootstrap-web-setup.js",
+        "start-bootstrap": "node services/start-bootstrap.js",
+        "stop-bootstrap": "node services/stop-bootstrap.js"
     }
 }
