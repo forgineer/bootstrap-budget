@@ -3,12 +3,11 @@
  * Purpose: Initialize the Bootstrap-Budget DB and Configurations over CLI
  * Author: Blake Phillips (forgineer)
  */
-
+const bcrypt = require('bcrypt');
 const fs = require('fs');
+const inquirer = require('inquirer');
 const os = require('os');
 const path = require('path');
-const inquirer = require('inquirer');
-const bcrypt = require('bcrypt');
 
 
 var curDate = new Date();
@@ -34,7 +33,7 @@ var tableBuildList = [
     , "CREATE_USER_BUDGET_TABLE.sql"
 ];
 
-
+// TODO: Uplift from web install
 let bootstrapSetup = new Promise(function(resolve, reject) {
 
     function setConfigObj(name, value) {

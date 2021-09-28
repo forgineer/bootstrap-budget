@@ -12,6 +12,42 @@ const os = require('os');
 const path = require('path');
 
 
+// Capture local IP addresses (best attempt anyway...)
+const osType = os.type();
+const nets = os.networkInterfaces();
+//console.log(JSON.stringify(nets));
+
+const interfaces = Object.create(null); // Or just '{}', an empty object
+let address;
+
+for(const name of Object.keys(nets)) {
+    for(const net of nets[name]) {
+        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+        if(net.family === 'IPv4' && !net.internal) {
+            if(!interfaces[name]) {
+                interfaces[name] = [];
+            }
+            interfaces[name].push(net.address);
+        }
+    }
+}
+
+//console.log(interfaces);
+
+// Set localhost IP address
+if(osType.includes("Windows")) {
+    if("Ethernet" in interfaces) {
+        address = interfaces["Ethernet"][0];
+    } else if("Wi-Fi" in interfaces) {
+        address = interfaces["Wi-Fi"][0];
+    } else {
+        address = "localhost"
+    }
+} else {    // TODO: Linux hosts
+    address = "localhost"
+}
+
+
 // Table SQL scripts
 var tableBuildList = [
     "CREATE_ACCOUNT_TABLE.sql"
@@ -23,8 +59,6 @@ var tableBuildList = [
     , "CREATE_USER_TABLE.sql"
     , "CREATE_USER_BUDGET_TABLE.sql"
 ];
-
-
 
 
 /**
@@ -44,27 +78,35 @@ service.options('*', cors());
 
 // Setup - Main
 service.get('/bootstrap/setup', function (req, res) {
-    var curDate = new Date();
-    var curTime = curDate.getTime();
-    var curIso = curDate.toISOString();
+    res.set('Content-Type', 'application/json');
 
-    res.send('In setup - ' + curIso);
-    res.sendStatus(200);
+    if(fs.existsSync(path.join(__dirname, "../data/BOOTSTRAP"))) {
+        res.status(200).json( {'setup': true} );
+    } else {
+        res.status(200).json( {'setup': false} );
+    }
 })
 
 // Setup - SQLite DB
 service.post('/bootstrap/setup/sqlite', function (req, res) {
     const sqlite3 = require('sqlite3').verbose();
-    var db = new sqlite3.Database(path.join(__dirname, "../data/" + req.body.db_name));
+    
+    var db = new sqlite3.Database(path.join(__dirname, "../data/BOOTSTRAP"));
+    
     let adminId;
-
+    
     var curDate = new Date();
     var curTime = curDate.getTime();
     var curIso = curDate.toISOString();
 
 
+    // Add OS Type to config (request) object
+    req.body.os_type = osType;
+
+
     function setAdminId(id) {
         adminId = id;
+        delete req.body.admin_password;
     }
 
 
@@ -87,7 +129,7 @@ service.post('/bootstrap/setup/sqlite', function (req, res) {
             }
         }
 
-        setTimeout(function(){ adminConfig(); }, 1000);
+        setTimeout(function() { adminConfig(); }, 1000);
     }
 
 
@@ -99,11 +141,11 @@ service.post('/bootstrap/setup/sqlite', function (req, res) {
                 function(err, sql) { if(err) { console.log(err); } }
             );
     
-            const salt = bcrypt.genSaltSync(10);
-            const hash = bcrypt.hashSync(req.body.admin_password, salt);
+            req.body.salt = bcrypt.genSaltSync(10);
+            req.body.hash = bcrypt.hashSync(req.body.admin_password, req.body.salt);
 
             db.serialize(function() {
-                db.run(sql, 'ADMIN', 'ADMIN', '', 'ADMIN', '', '', '', '', '', '', '', hash, salt, 0, 1, curTime, curIso, curTime, curIso, 1, 
+                db.run(sql, 'ADMIN', 'ADMIN', '', 'ADMIN', '', '', '', '', '', '', '', req.body.hash, req.body.salt, 0, 1, curTime, curIso, curTime, curIso, 1, 
                     function(err) {
                         setAdminId(this.lastID);
                     }
@@ -114,7 +156,7 @@ service.post('/bootstrap/setup/sqlite', function (req, res) {
             console.log("INSERT_USER.sql does NOT exists in sql dir. Exiting...");
         }
 
-        setTimeout(function(){ postConfig(adminId); }, 1000);
+        setTimeout(function() { postConfig(adminId); }, 1000);
     }
 
 
@@ -134,23 +176,24 @@ service.post('/bootstrap/setup/sqlite', function (req, res) {
                     db.run(sql, `${key}`, 0, 0, `${value}`, 3, adminId, curTime, curIso, curTime, curIso, 1);
                   }
             });
+
+            setTimeout(function() {
+                console.log("...Finished!");
+
+                db.close();
+                res.set('Content-Type', 'application/json');
+                res.status(200).json( {'setup': true} );
+            }, 1000);
     
         } else {
             console.log("INSERT_CONFIG.sql does NOT exists in sql dir. Exiting...");
         }
-
-        setTimeout(function() {
-            db.close();
-            res.set('Content-Type', 'application/json')
-            res.status(200).json({'sqlite_time': curIso});
-        }, 1000);
     }
 
+    // TODO: Setup HTML pages (replace host:port)
+    // TODO: Setup web service (if any)
+
     createTables(); // Start
-
-
-//    res.set('Content-Type', 'application/json')
-//    res.status(200).json({'sqlite_time': curIso});
 })
 
 // Setup - MariaDB DB
@@ -159,8 +202,48 @@ service.post('/bootstrap/setup/mariadb', function (req, res) {
     var curTime = curDate.getTime();
     var curIso = curDate.toISOString();
 
-    res.send('In mariadb - ' + curIso);
-    res.sendStatus(200);
+    res.status(200).json({'mariadb': curIso});
+})
+
+// Start Over
+service.post('/bootstrap/startover', function (req, res) {
+    res.set('Content-Type', 'application/json');
+
+    let hash;
+
+    if(fs.existsSync(path.join(__dirname, "../data/BOOTSTRAP"))) {
+        const sqlite3 = require('sqlite3').verbose();
+        var db = new sqlite3.Database(path.join(__dirname, "../data/BOOTSTRAP"), sqlite3.OPEN_READONLY);
+
+        db.serialize(function() {
+            db.each("SELECT config_text, config_value_txt FROM CONFIG WHERE config_text = 'hash'", function(err, row) {
+                //console.log(row.config_text + ": " + row.config_value_txt);
+
+                if(err) { res.status(200).json({'startover': false}); }
+
+                hash = row.config_value_txt;
+            });
+        });
+
+        setTimeout(function() {
+            db.close();
+
+            //console.log(hash);
+            //console.log(JSON.stringify(req.body));
+
+            bcrypt.compare(req.body.admin_password, hash, function(err, result) {
+                if(result) {
+                    fs.unlinkSync(path.join(__dirname, "../data/BOOTSTRAP"))
+                    res.status(200).json({'startover': true}); 
+                } else {
+                    res.status(200).json({'startover': false});
+                }
+            });
+        }, 1000);
+
+    } else {
+        res.status(200).json({'startover': false});
+    }
 })
 
 // Bootstrap Setup Service
@@ -200,6 +283,7 @@ http.createServer(function (req, res) {
 
 }).listen(8080);
 
+
 // Console will print the message
-console.log("Bootstrap Setup micro-service listening at http://localhost:8081/bootstrap/setup")
-console.log('Navigate to http://localhost:8080/bootstrap-web-setup.html to complete Bootstrap install');
+console.log("Navigate to http://" + address + ":8080/bootstrap-web-setup.html to complete Bootstrap install.");
+console.log("Close service when finished (Ctrl+C).");
