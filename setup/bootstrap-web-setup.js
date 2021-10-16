@@ -14,7 +14,10 @@ const path = require('path');
 
 // Capture local IP addresses (best attempt anyway...)
 const osType = os.type();
+const osHostname = os.hostname();   // TODO: Using hostname over IP address
 const nets = os.networkInterfaces();
+//console.log("osType -> " + osType);
+//console.log("osHostname -> " + osHostname);
 //console.log(JSON.stringify(nets));
 
 const interfaces = Object.create(null); // Or just '{}', an empty object
@@ -81,7 +84,7 @@ service.get('/bootstrap/setup', function (req, res) {
     res.set('Content-Type', 'application/json');
 
     if(fs.existsSync(path.join(__dirname, "../data/BOOTSTRAP"))) {
-        res.status(200).json( {'setup': true} );
+        res.status(200).json( {'setup': true, 'hostname': osHostname} );
     } else {
         res.status(200).json( {'setup': false} );
     }
@@ -285,5 +288,5 @@ http.createServer(function (req, res) {
 
 
 // Console will print the message
-console.log("Navigate to http://" + address + ":8080/bootstrap-web-setup.html to complete Bootstrap install.");
+console.log("Navigate to http://" + osHostname + ":8080 to complete Bootstrap install.");
 console.log("Close service when finished (Ctrl+C).");

@@ -21,7 +21,7 @@
     },
     "scripts": {
         "setup": "node setup/bootstrap-web-setup.js",
-        "start": "node services/bootstrap-monitor.js start",
-        "stop": "node services/bootstrap-monitor.js stop"
+        "start": "node service/bootstrap-monitor.js start",
+        "stop": "node service/bootstrap-monitor.js stop"
     }
 }

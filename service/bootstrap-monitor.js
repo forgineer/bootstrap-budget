@@ -1,28 +1,34 @@
 const forever = require('forever-monitor');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
-var monArgs = process.argv.slice(2);
-var jSourceDir = "";
 
+
+var monArgs = process.argv.slice(2);
 var jSourceDir = path.join(__dirname, "../service");
+var jLogPath = path.join(__dirname, "../log");
+
+//console.log(jSourceDir);
+//console.log(jPidFilePath);
 
 var jService = monArgs[0]
 var jConfig = {
     //
     // Basic configuration options
     //
-    'silent': false,            // Silences the output from stdout and stderr in the parent process
-    'uid': 'your-UID',          // Custom uid for this forever process. (default: autogen)
-    'pidFile': 'path/to/a.pid', // Path to put pid information for the process(es) started
-    'max': 10,                  // Sets the maximum number of times a given script should run
-    'killTree': true,           // Kills the entire child process tree on `exit`
+    'silent': false,              // Silences the output from stdout and stderr in the parent process
+    'uid': 'bootstrap-monitor',   // Custom uid for this forever process. (default: autogen)
+    'pidFile': jLogPath,          // Path to put pid information for the process(es) started
+    'max': 10,                    // Sets the maximum number of times a given script should run
+    'killTree': true,             // Kills the entire child process tree on `exit`
 
     //
     // Command to spawn as well as options and other vars
     // (env, cwd, etc) to pass along
     //
     'args':    ['foo','bar'],  // Additional arguments to pass to the script,
-    'sourceDir': 'script/path',// Directory that the source script is in
+    'sourceDir': jSourceDir,// Directory that the source script is in
 
     //
     // Options for restarting on watched files.
@@ -35,11 +41,12 @@ var jConfig = {
     //
     // Log files and associated logging options for this instance
     //
-    'logFile': 'path/to/file', // Path to log output from forever process (when daemonized)
-    'outFile': 'path/to/file', // Path to log output from child stdout
-    'errFile': 'path/to/file', // Path to log output from child stderr
+    'logFile': jLogPath, // Path to log output from forever process (when daemonized)
+    'outFile': jLogPath, // Path to log output from child stdout
+    'errFile': jLogPath, // Path to log output from child stderr
 }
 
+/*
 var child = new (forever.Monitor)(jService, jConfig);
 
 child.on('exit', function () {
@@ -47,3 +54,4 @@ child.on('exit', function () {
 });
 
 child.start();
+*/

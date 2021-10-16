@@ -15,8 +15,11 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
         <script>
+            const hostUrl = new URL(document.URL);
+            const hostname = hostUrl.hostname;
+
             $(document).ready(function() {
-                $.get("http://localhost:8081/bootstrap/setup", function(data) {
+                $.get("http://" + hostname + ":8081/bootstrap/setup", function(data) {
 
                     if(data.setup == false) {
                         let formArray = [];
@@ -186,7 +189,7 @@
                         config.admin_password = $('input[id="adminPasswd"]').val();
 
                         //alert(JSON.stringify(config));
-                        var postConfg = $.post('http://localhost:8081/bootstrap/setup/sqlite', config);
+                        var postConfg = $.post("http://" + hostname + ":8081/bootstrap/setup/sqlite", config);
                         
                         postConfg.done(function(data) { location.reload(true); }); 
                         postConfg.fail(function() { alert("Failed to complete setup!"); location.reload(true); });
@@ -202,7 +205,7 @@
 
                 startover.admin_password = $('input[id="startOverPasswd"]').val();
 
-                $.post("http://localhost:8081/bootstrap/startover", startover)
+                $.post("http://" + hostname + ":8081/bootstrap/startover", startover)
                     .done(function(data) {
                         //alert(JSON.stringify(data));
 
