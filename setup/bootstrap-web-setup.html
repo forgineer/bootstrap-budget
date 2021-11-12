@@ -17,9 +17,10 @@
         <script>
             const hostUrl = new URL(document.URL);
             const hostname = hostUrl.hostname;
+            const port = "$PORT$"
 
             $(document).ready(function() {
-                $.get("http://" + hostname + ":8081/bootstrap/setup", function(data) {
+                $.get("http://" + hostname + ":" + port + "/bootstrap/setup", function(data) {
 
                     if(data.setup == false) {
                         let formArray = [];
@@ -156,6 +157,7 @@
                 config.services_address = $('input[id="apiAddress"]').attr("placeholder");
                 config.services_port = $('input[id="apiPort"]').attr("placeholder");
 
+                // TODO: MariaDB configuration goes here
                 /*
                 if(config.db_service == "mariadb") {
                             config.db_username = answers.db_username;
@@ -189,7 +191,7 @@
                         config.admin_password = $('input[id="adminPasswd"]').val();
 
                         //alert(JSON.stringify(config));
-                        var postConfg = $.post("http://" + hostname + ":8081/bootstrap/setup/sqlite", config);
+                        var postConfg = $.post("http://" + hostname + ":" + port + "/bootstrap/setup/sqlite", config);
                         
                         postConfg.done(function(data) { location.reload(true); }); 
                         postConfg.fail(function() { alert("Failed to complete setup!"); location.reload(true); });
@@ -205,7 +207,7 @@
 
                 startover.admin_password = $('input[id="startOverPasswd"]').val();
 
-                $.post("http://" + hostname + ":8081/bootstrap/startover", startover)
+                $.post("http://" + hostname + ":" + port + "/bootstrap/startover", startover)
                     .done(function(data) {
                         //alert(JSON.stringify(data));
 

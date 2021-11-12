@@ -12,6 +12,20 @@ const os = require('os');
 const path = require('path');
 
 
+// Capture port arguments
+var portArg = process.argv.slice(2);
+var web_port = 8080;
+var srv_port = 8081;
+
+if( !(isNaN(portArg[0]) && !isNaN(portArg[1])) ) {
+    //console.log(portArg[0]);
+    //console.log(portArg[1]);
+
+    web_port = +portArg[0];
+    srv_port = +portArg[1];
+} 
+
+
 // Capture local IP addresses (best attempt anyway...)
 const osType = os.type();
 const osHostname = os.hostname();   // TODO: Using hostname over IP address
@@ -250,9 +264,7 @@ service.post('/bootstrap/startover', function (req, res) {
 })
 
 // Bootstrap Setup Service
-var setup = service.listen(8081);
-
-
+var setup = service.listen(srv_port);
 
 
 /**
@@ -270,23 +282,25 @@ http.createServer(function (req, res) {
             // Content Type: text/plain
             res.writeHead(404, {'Content-Type': 'text/html'});
 
-        } else {	
+        } else {
+            var html = data.toString();
+
             // Page found	  
             // HTTP Status: 200 : OK
-            // Content Type: text/plain
+            // Content Type: text/html
             res.writeHead(200, {'Content-Type': 'text/html'});	
 
             // Write the content of the file to response body
-            res.write(data);		
+            res.write(html.replace("$PORT$", srv_port.toString()));		
         }
 
         // Send the response body 
         res.end();
     });
 
-}).listen(8080);
+}).listen(web_port);
 
 
 // Console will print the message
-console.log("Navigate to http://" + osHostname + ":8080 to complete Bootstrap install.");
+console.log("Navigate to http://" + osHostname + ":" + web_port + " to complete Bootstrap install.");
 console.log("Close service when finished (Ctrl+C).");
