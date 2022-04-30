@@ -14,12 +14,14 @@ const path = require('path');
 
 // Capture port arguments
 var portArg = process.argv.slice(2);
-var web_port = 8080;
-var srv_port = 8081;
+//console.log(portArg[0]);
+//console.log(portArg[1]);
 
-if( !(isNaN(portArg[0]) && !isNaN(portArg[1])) ) {
-    //console.log(portArg[0]);
-    //console.log(portArg[1]);
+var web_port = 8181;
+var srv_port = 8182;
+
+if( ( portArg[0] !== undefined && portArg[1] !== undefined ) &&
+    ( !(isNaN(portArg[0]) && !isNaN(portArg[1])) ) ) {
 
     web_port = +portArg[0];
     srv_port = +portArg[1];
