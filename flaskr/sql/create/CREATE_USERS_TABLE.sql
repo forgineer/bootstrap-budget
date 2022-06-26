@@ -20,9 +20,7 @@ CREATE TABLE USERS (
 	salt varchar(100),
 	tutorial_ind integer DEFAULT 1,
 	admin_ind integer DEFAULT 0 NOT NULL,
-	create_dt_tm real NOT NULL,
-	create_iso_ts varchar(30) NOT NULL,
-	updt_dt_tm real NOT NULL,
-	updt_iso_ts varchar(30) NOT NULL,
+	create_dt_tm timestamp NOT NULL,
+	updt_dt_tm timestamp NOT NULL,
 	active_ind integer DEFAULT 1 NOT NULL
 );

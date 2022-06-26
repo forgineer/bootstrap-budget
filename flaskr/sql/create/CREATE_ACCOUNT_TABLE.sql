@@ -9,11 +9,11 @@ CREATE TABLE ACCOUNT (
 	account_desc varchar(500),
 	account_nbr varchar(50),
 	account_route_nbr varchar(50),
-	account_open_amt real DEFAULT 0 NOT NULL,
+	account_open_amt real DEFAULT 0.0 NOT NULL,
 	account_est_amt real,
 	budget_id integer NOT NULL,
 	user_id integer NOT NULL,
-	create_dt_tm real NOT NULL,
-	updt_dt_tm real NOT NULL,
+	create_dt_tm timestamp NOT NULL,
+	updt_dt_tm timestamp NOT NULL,
 	active_ind integer DEFAULT 1 NOT NULL
 );

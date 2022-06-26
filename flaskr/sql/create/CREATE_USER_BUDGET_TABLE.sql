@@ -8,9 +8,7 @@ CREATE TABLE USER_BUDGET (
 	user_id integer NOT NULL,
 	budget_id integer NOT NULL,
 	permissions integer NOT NULL,
-	create_dt_tm real NOT NULL,
-	create_iso_ts varchar(30) NOT NULL,
-	updt_dt_tm real NOT NULL,
-	updt_iso_ts varchar(30) NOT NULL,
+	create_dt_tm timestamp NOT NULL,
+	updt_dt_tm timestamp NOT NULL,
 	active_ind integer DEFAULT 1 NOT NULL
 );
