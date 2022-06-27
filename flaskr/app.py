@@ -7,6 +7,10 @@ import psycopg2
 app = Flask(__name__)
 
 
+# Get DB environment var
+DATABASE_URL = os.environ['DATABASE_URL']
+
+
 @app.route("/")
 def index():
     return render_template('index.html')
