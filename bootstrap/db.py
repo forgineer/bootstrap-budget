@@ -9,8 +9,6 @@ def get_db():
     if 'db' not in g:
         # Get DB environment var
         DATABASE_URL = os.environ['DATABASE_URL']
-        #DATABASE_URL = 'postgres://fmclgrvutqfihl:91985637a4936ec8f11fbb18455bd4d1ac9308725409f5323c32745db00d383a\
-        # @ec2-52-72-56-59.compute-1.amazonaws.com:5432/d8g771gs0trs2h'
 
         g.db = psql.connect(DATABASE_URL)
 
