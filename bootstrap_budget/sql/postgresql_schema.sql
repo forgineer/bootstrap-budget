@@ -1,6 +1,6 @@
 /**
  * Name: postgresql_schema.sql
- * Purpose: Creates the table schema for Bootstrap Budget
+ * Purpose: Creates the Bootstrap Budget table schema for PostgreSQL
  * Author: Blake Phillips (forgineer)
  */
 DROP TABLE IF EXISTS config;

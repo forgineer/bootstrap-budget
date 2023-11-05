@@ -1,4 +1,3 @@
-import os
 from flask import Flask, render_template
 from logging.config import dictConfig
 
