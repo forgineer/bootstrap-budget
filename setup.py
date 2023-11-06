@@ -16,6 +16,7 @@ setup(
     url='https://github.com/forgineer/bootstrap-budget',
     license='MIT License',
     packages=['bootstrap_budget'],
+    include_package_data=True,
     python_requires='>=3.7',
     install_requires=[
         'flask'
