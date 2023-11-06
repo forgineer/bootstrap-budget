@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     python_requires='>=3.7',
     install_requires=[
-        'bcrypt'
+        'bcrypt',
         'flask'
     ],
     extras_require={  # pip install -e .[pypi_deployment]
