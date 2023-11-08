@@ -33,8 +33,6 @@ CREATE TABLE USERS (
 	email TEXT,
 	phone_number TEXT,
 	hash TEXT NOT NULL,
-	salt TEXT NOT NULL,
-	is_admin INTEGER DEFAULT 0 NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL
@@ -42,11 +40,9 @@ CREATE TABLE USERS (
 --
 CREATE TABLE CONFIG (
 	config_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	config_text TEXT NOT NULL,
-	config_value_int INTEGER,
-	config_value_flt REAL,
-	config_value_txt TEXT,
-	config_value_set INTEGER DEFAULT 0 NOT NULL,
+	config_description TEXT NOT NULL,
+	config_value TEXT,
+	config_value_type INTEGER DEFAULT 0 NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
@@ -57,7 +53,7 @@ CREATE TABLE CONFIG (
 CREATE TABLE BUDGET (
 	budget_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	budget_name TEXT UNIQUE NOT NULL,
-	budget_desc TEXT,
+	budget_description TEXT,
 	budget_year INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
@@ -127,8 +123,7 @@ CREATE TABLE ACCOUNT (
 --
 CREATE TABLE TRANSACTIONS (
 	transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	transaction_desc TEXT,
-	transaction_norm TEXT,
+	transaction_description TEXT,
 	transaction_amt REAL DEFAULT 0.0 NOT NULL,
 	transaction_dt_tm TEXT NOT NULL,
 	transaction_year INTEGER GENERATED ALWAYS AS (STRFTIME('%Y', transaction_dt_tm)) VIRTUAL NOT NULL,

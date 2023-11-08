@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from logging.config import dictConfig
+from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget modules/classes/functions
 from .users import Users
@@ -26,12 +27,16 @@ dictConfig({
 })
 
 
-def start(test_config=None):
+def main(test_config=None):
     # Create and configure the app
     app = Flask(__name__)
 
     @app.route("/")
     def index():
         return render_template('index.html')
+
+    @app.route("/admin/stop")
+    def stop():
+        return '<p>STOP!</p>'
 
     return app

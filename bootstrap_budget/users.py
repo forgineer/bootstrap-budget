@@ -1,17 +1,8 @@
-import bcrypt
 import datetime
 import sqlite3
 
 from importlib.resources import files
-
-
-def hash_password(password: bytes) -> tuple:
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password, salt), salt
-
-
-def validate_password(password: bytes, password_hash: bytes):
-    return bcrypt.checkpw(password, password_hash)
+from werkzeug.security import generate_password_hash
 
 
 class Users:
@@ -52,13 +43,13 @@ class Users:
         self.is_admin = fields.get('is_admin', False)
         self.is_active = fields.get('is_active', True)
 
-    def create(self, user_password: bytes) -> None:
+    def create(self, user_password: str) -> None:
         insert_user: str = files('bootstrap_budget').joinpath('db/sqlite/create_user.sql').read_text()
         db_connection: sqlite3.Connection = sqlite3.connect(f'bootstrap_budget.db')
         sql_cursor: sqlite3.Cursor = db_connection.cursor()
 
         # Generate password hash and salt
-        hashed_password, password_salt = hash_password(user_password)
+        hashed_password = generate_password_hash(user_password)
 
         # Capture current datetime for creation and update timestamps
         current_datetime = datetime.datetime.now()
@@ -78,7 +69,6 @@ class Users:
                 self.email,
                 self.phone_number,
                 hashed_password,  # hash
-                password_salt,  # salt
                 self.is_admin,
                 current_datetime_iso,  # created_dt_tm
                 current_datetime_iso,  # updated_dt_tm

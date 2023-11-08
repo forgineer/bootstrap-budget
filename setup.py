@@ -8,7 +8,7 @@ with open("README.md") as f:
 
 setup(
     name='bootstrap-budget',
-    version='0.0.3',
+    version='0.0.4',
     author='forgineer',
     description='A simple financial application to help you pull your budget up by its bootstraps.',
     long_description=long_description,
@@ -17,15 +17,11 @@ setup(
     license='MIT License',
     packages=['bootstrap_budget'],
     include_package_data=True,
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=[
-        'bcrypt',
         'flask'
     ],
-    extras_require={  # pip install -e .[pypi_deployment]
-        'docs': [
-            'mkdocs'
-        ],
+    extras_require={  # pip install -e .[pypi_packaging]
         'deployment': [
             'build',
             'twine'
@@ -33,7 +29,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'bootstrap-init = bootstrap_budget.cli:bootstrap_init'
+            'bootstrap = bootstrap_budget.cli:bootstrap'
         ]
     },
     keywords='personal budget,budgeting,web app',
@@ -53,6 +49,5 @@ setup(
 Build and deploy steps:
     - python -m build
     - twine check dist/*
-    - twine upload -r testpypi dist/*
     - twine upload dist/*
 """
