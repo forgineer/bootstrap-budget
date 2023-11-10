@@ -1,0 +1,54 @@
+<!-- Original code: @thecodeplayer, Link Source Code: https://code.sololearn.com/Wj7ZWBg5m2OG/#html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bootstrap Budget!</title>
+
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg') }}" color="#5bbad5">
+
+    <meta name="msapplication-TileColor" content="#00a300">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='forgineer/forgineer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='forgineer/forgineer.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='forgineer/forgineer_avatar.png') }}" alt="Avatar Logo" style="width:40px;" class="rounded-pill">
+            <code class="text-danger">forgineer</code>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/forgineer" title="GitHub">GitHub</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://forgineer.blogspot.com/" title="The Forge Notes">Blog</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Projects</a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="/bootstrap-budget" title="Bootstrap-Budget Documentation">bootstrap-budget</a></li>
+                        <li><a class="dropdown-item" href="/pandas-liteql" title="Pandas-LiteQL Documentation">pandas-liteql</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<canvas id="c"></canvas>
+<!-- span id="author">forgineer.pythonanywhere</--span-->
+<script src="{{ url_for('static', filename='forgineer/matrix.js') }}"></script>
+</body>
+</html>

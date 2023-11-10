@@ -19,7 +19,15 @@ setup(
     include_package_data=True,
     python_requires='>=3.8',
     install_requires=[
-        'flask'
+        'blinker==1.7.0',
+        'click==8.1.7',
+        'colorama==0.4.6',
+        'Flask==2.3.3',
+        'itsdangerous==2.1.2',
+        'Jinja2==3.1.2',
+        'MarkupSafe==2.1.3',
+        'waitress==2.1.2',
+        'Werkzeug==3.0.1'
     ],
     extras_require={  # pip install -e .[pypi_packaging]
         'deployment': [
