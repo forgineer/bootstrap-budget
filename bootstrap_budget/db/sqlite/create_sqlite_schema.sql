@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS BUDGET;
 DROP TABLE IF EXISTS USERS;
 --
 CREATE TABLE USERS (
-	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	last_name TEXT,
 	first_name TEXT,
 	middle_name TEXT,
@@ -39,58 +39,58 @@ CREATE TABLE USERS (
 );
 --
 CREATE TABLE CONFIG (
-	config_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	config_description TEXT NOT NULL,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	description TEXT NOT NULL,
 	config_value TEXT,
 	config_value_type INTEGER DEFAULT 0 NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 );
 --
 CREATE TABLE BUDGET (
-	budget_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	budget_name TEXT UNIQUE NOT NULL,
-	budget_description TEXT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT UNIQUE NOT NULL,
+	description TEXT,
 	budget_year INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 );
 --
 CREATE TABLE USER_BUDGET (
-	user_budget_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	user_id INTEGER NOT NULL,
 	budget_id INTEGER NOT NULL,
 	permissions INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (budget_id) REFERENCES BUDGET (budget_id),
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (budget_id) REFERENCES BUDGET (id),
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 );
 --
 CREATE TABLE BUDGET_ITEMS (
-	budget_item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	budget_id INTEGER NOT NULL,
-	budget_item_name TEXT UNIQUE NOT NULL,
-	budget_item_desc TEXT,
-	budget_item_amt REAL DEFAULT 0.0 NOT NULL,
-	budget_item_seq INTEGER DEFAULT 99 NOT NULL,
+	name TEXT UNIQUE NOT NULL,
+	description TEXT,
+	budget_amount REAL DEFAULT 0.0 NOT NULL,
+	sequence INTEGER DEFAULT 99 NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (budget_id) REFERENCES BUDGET (budget_id),
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (budget_id) REFERENCES BUDGET (id),
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 );
 --
 CREATE TABLE DASHBOARD (
-	dashboard_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	dashboard_year INTEGER NOT NULL,
 	dashboard_month INTEGER NOT NULL,
 	budget_id INTEGER NOT NULL,
@@ -99,44 +99,43 @@ CREATE TABLE DASHBOARD (
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (budget_id) REFERENCES BUDGET (budget_id),
-	FOREIGN KEY (budget_item_id) REFERENCES BUDGET_ITEMS (budget_item_id)
+	FOREIGN KEY (budget_id) REFERENCES BUDGET (id),
+	FOREIGN KEY (budget_item_id) REFERENCES BUDGET_ITEMS (id)
 );
 --
 CREATE TABLE ACCOUNTS (
-	account_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	account_name TEXT UNIQUE NOT NULL,
-	account_desc TEXT,
-	account_nbr TEXT,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT UNIQUE NOT NULL,
+	description TEXT,
+	account_number TEXT,
 	account_route_nbr TEXT,
-	account_open_amt REAL DEFAULT 0.0 NOT NULL,
-	account_est_amt REAL,
+	opening_amount REAL DEFAULT 0.0 NOT NULL,
 	budget_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (budget_id) REFERENCES BUDGET (budget_id),
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (budget_id) REFERENCES BUDGET (id),
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 
 );
 --
 CREATE TABLE TRANSACTIONS (
-	transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	transaction_description TEXT,
-	transaction_amt REAL DEFAULT 0.0 NOT NULL,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	description TEXT,
+	amount REAL DEFAULT 0.0 NOT NULL,
 	transaction_dt_tm TEXT NOT NULL,
 	transaction_year INTEGER GENERATED ALWAYS AS (STRFTIME('%Y', transaction_dt_tm)) VIRTUAL NOT NULL,
     transaction_month INTEGER GENERATED ALWAYS AS (STRFTIME('%m', transaction_dt_tm)) VIRTUAL NOT NULL,
     transaction_day INTEGER GENERATED ALWAYS AS (STRFTIME('%d', transaction_dt_tm)) VIRTUAL NOT NULL,
-	transaction_note TEXT,
+	note TEXT,
 	budget_item_id INTEGER DEFAULT 0 NOT NULL,
 	account_id INTEGER DEFAULT 0 NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (account_id) REFERENCES ACCOUNTS (account_id),
-	FOREIGN KEY (budget_item_id) REFERENCES BUDGET_ITEMS (budget_item_id),
-	FOREIGN KEY (user_id) REFERENCES USERS (user_id)
+	FOREIGN KEY (account_id) REFERENCES ACCOUNTS (id),
+	FOREIGN KEY (budget_item_id) REFERENCES BUDGET_ITEMS (id),
+	FOREIGN KEY (user_id) REFERENCES USERS (id)
 );
