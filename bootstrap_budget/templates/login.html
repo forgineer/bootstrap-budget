@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+        <form class="bg-dark" method="post">
+            <div class="bg-dark fadeIn">
+                <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" />
+            </div>
+            <input name="username" id="username" class="fadeIn" placeholder="login" required>
+            <input name="password" id="password" type="password" class="fadeIn" placeholder="password" required>
+            <input type="submit" class="btn btn-warning" value="Log In">
+        </form>
+    </div>
+</div>
+{% endblock %}

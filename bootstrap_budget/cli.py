@@ -1,6 +1,7 @@
 import click
 import datetime
 import os
+import secrets
 import sqlite3
 
 from importlib.resources import files
@@ -75,6 +76,52 @@ def create_admin_account() -> None:
         click.echo(e)
 
 
+def create_admin_config() -> None:
+    """
+    Creates the admin related configurations on the CONFIG table.
+    Configurations created:
+        - SECRET_KEY
+
+    :return: None
+    """
+    create_config_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_config.sql').read_text()
+    db_connection: sqlite3.Connection = sqlite3.connect(f'bootstrap_budget.db')
+    sql_cursor: sqlite3.Cursor = db_connection.cursor()
+
+    EMPTY_STRING: str = ''
+    TYPE_AFFINITY_TEXT: int = 2
+    ADMIN_ID: int = 1
+
+    # Generate SECRET_KEY for Flask config
+    secret_key = secrets.token_urlsafe(32)
+    secret_key_description = """A secret key that will be used for securely signing the session cookie and can be used 
+    for any other security related needs by extensions or your application. It should be a long random bytes or str."""
+
+    # Capture current datetime for creation and update timestamps
+    current_datetime = datetime.datetime.now()
+    current_datetime_iso = current_datetime.isoformat()
+
+    try:
+        response = sql_cursor.execute(create_config_statement, [
+            'SECRET_KEY',           # name
+            secret_key_description, # description
+            secret_key,             # config_value
+            TYPE_AFFINITY_TEXT,     # config_value_type
+            ADMIN_ID,               # user_id
+            current_datetime_iso,   # created_dt_tm
+            current_datetime_iso,   # updated_dt_tm
+            True                    # is_active
+        ])
+
+        db_connection.commit()
+        db_connection.close()
+
+        click.echo('The Bootstrap Budget SECRET_KEY has been configured.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+
 def reset_admin_password() -> None:
     """
     Resets the admin account password.
@@ -132,12 +179,14 @@ def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: boo
                                  'Are you sure you want to do this?'):
                     create_schema()
                     create_admin_account()
+                    create_admin_config()
                     click.echo('Your Boostrap Budget install has been completely reset.')
             else:
                 click.echo('Bootstrap Budget has already setup. No action is needed.')
         else:
             create_schema()
             create_admin_account()
+            create_admin_config()
             click.echo('Your Boostrap Budget setup is complete!')
     elif reset_admin:
         if click.confirm('You are about to reset your admin account. Are you sure you want to do this?'):

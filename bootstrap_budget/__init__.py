@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request
+import importlib.metadata
+
+from flask import Flask, render_template, redirect, request, url_for
 from logging.config import dictConfig
 from werkzeug.security import check_password_hash
 
-# Import bootstrap-budget modules/classes/functions
-from .users import Users
+
+# Set Bootstrap Budget version
+__version__: str = importlib.metadata.version("bootstrap_budget")
 
 
 dictConfig({
@@ -27,16 +30,29 @@ dictConfig({
 })
 
 
-def main(test_config=None):
+def main() -> Flask:
+    """
+    The main function for Bootstrap Budget.
+
+    :return: A Flask app (Bootstrap Budget)
+    """
     # Create and configure the app
     app = Flask(__name__)
 
-    @app.route("/")
-    def index():
-        return render_template('index.html')
+    app.config.from_mapping(
+        SECRET_KEY='dev'
+    )
 
-    @app.route("/admin/stop")
-    def stop():
-        return '<p>STOP!</p>'
+    # Register Bootstrap Budget blueprints
+    from . import auth
+    from . import user
+    #from . import admin
+
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(user.bp)
+    #app.register_blueprint(admin.bp)
+
+    # Define the index entry point: The Boostrap Budget Dashboard
+    app.add_url_rule("/", endpoint="user.index")
 
     return app
