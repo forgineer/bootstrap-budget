@@ -70,14 +70,8 @@ def login() -> Response | str:
             #if form_username == 'admin':
             #    return redirect(url_for('admin.console'))
             #else:
-            return redirect(url_for('index'))
+            return redirect(url_for('user.index'))
 
         flash(error)
 
     return render_template('login.html')
-
-
-@bp.route('/logout')
-def logout() -> Response:
-    session.clear()
-    return redirect(url_for('index'))

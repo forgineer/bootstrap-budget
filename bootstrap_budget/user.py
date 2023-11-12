@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -41,3 +41,9 @@ def accounts() -> str:
 @login_required
 def account_transactions() -> str:
     return render_template('transactions.html')
+
+
+@bp.route('/logout')
+def logout() -> Response:
+    session.clear()
+    return redirect(url_for('auth.login'))
