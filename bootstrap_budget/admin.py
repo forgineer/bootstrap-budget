@@ -9,10 +9,10 @@ from . import db
 
 
 # Define as a Flask blueprint: Admin
-bp = Blueprint('admin', __name__)
+bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-@bp.route("/admin")
+@bp.route("/")
 def admin_console():
     return render_template('admin.html')
 

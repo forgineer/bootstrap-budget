@@ -8,7 +8,7 @@ with open("README.md") as f:
 
 setup(
     name='bootstrap-budget',
-    version='0.0.6',
+    version='0.0.7',
     author='forgineer',
     description='A simple financial application to help you pull your budget up by its bootstraps.',
     long_description=long_description,

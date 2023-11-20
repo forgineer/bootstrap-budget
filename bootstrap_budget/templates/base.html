@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+
         <title>Bootstrap Budget!</title>
 
         <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
@@ -14,11 +17,12 @@
 
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
         <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+        {% block login_css %}{% endblock %}
     </head>
     <body>
         <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="/dashboard">
                     <img src="{{ url_for('static', filename='images/bootstrap-logo-ffffff-v2.png') }}" width="204" height="28" alt="Bootstrap Budget Large Logo">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">

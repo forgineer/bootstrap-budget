@@ -1,8 +1,26 @@
 import datetime
+import functools
 import sqlite3
 
+from flask import (
+    Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
+)
 from importlib.resources import files
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from bootstrap_budget.db import get_db
+from .auth import login_required
+
+
+# Define as a Flask blueprint: User
+bp = Blueprint('users', __name__, url_prefix='/users')
+
+
+@bp.route("/")
+@login_required
+def index() -> str:
+    return render_template('dashboard.html')
+
 
 
 class Users:
@@ -80,3 +98,7 @@ class Users:
             print(e)
 
         db_connection.close()
+
+
+def get_users() -> list[Users]:
+    pass

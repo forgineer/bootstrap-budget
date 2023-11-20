@@ -4,6 +4,17 @@ from flask import Flask, render_template, redirect, request, url_for
 from logging.config import dictConfig
 from werkzeug.security import check_password_hash
 
+# Import Bootstrap Budget modules
+from . import accounts
+from . import admin
+from . import auth
+from . import budget
+from . import budget_items
+from . import config
+from . import dashboard
+from . import transactions
+from . import users
+
 
 # Set Bootstrap Budget version
 __version__: str = importlib.metadata.version("bootstrap_budget")
@@ -44,15 +55,17 @@ def main() -> Flask:
     )
 
     # Register Bootstrap Budget blueprints
-    from . import auth
-    from . import user
-    #from . import admin
-
+    app.register_blueprint(accounts.bp)
+    app.register_blueprint(admin.bp)
     app.register_blueprint(auth.bp)
-    app.register_blueprint(user.bp)
-    #app.register_blueprint(admin.bp)
+    app.register_blueprint(budget.bp)
+    app.register_blueprint(budget_items.bp)
+    #app.register_blueprint(config.bp)
+    app.register_blueprint(dashboard.bp)
+    app.register_blueprint(transactions.bp)
+    app.register_blueprint(users.bp)
 
     # Define the index entry point: The Boostrap Budget Dashboard
-    app.add_url_rule("/", endpoint="user.index")
+    app.add_url_rule("/", endpoint="dashboard.index")
 
     return app

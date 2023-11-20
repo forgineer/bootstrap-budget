@@ -10,10 +10,10 @@ from .auth import login_required
 
 
 # Define as a Flask blueprint: User
-bp = Blueprint('accounts', __name__, url_prefix='/accounts')
+bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 
 @bp.route("/")
 @login_required
 def index() -> str:
-    return render_template('accounts.html')
+    return render_template('dashboard.html')
