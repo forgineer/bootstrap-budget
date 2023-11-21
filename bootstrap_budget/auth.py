@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
+    abort, Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -40,6 +40,28 @@ def load_logged_in_user() -> None:
             get_db().execute("SELECT * FROM USERS WHERE id = ?",
                              (user_id,)).fetchone()
         )
+
+
+def admin_only(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session['username'] == 'admin':
+            return view(**kwargs)
+        else:
+            return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
+
+    return wrapped_view
+
+
+def user_only(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session['username'] != 'admin':
+            return view(**kwargs)
+        else:
+            return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
+
+    return wrapped_view
 
 
 @bp.route('/login', methods=('GET', 'POST'))
