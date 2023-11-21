@@ -50,6 +50,8 @@ def main() -> Flask:
     # Create and configure the app
     app = Flask(__name__)
 
+    # TODO: Extract and set SECRET_KEY from database config. If database or config not found, raise and exception to
+    #  prevent loading
     app.config.from_mapping(
         SECRET_KEY='dev'
     )

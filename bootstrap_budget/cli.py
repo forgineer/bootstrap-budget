@@ -106,8 +106,9 @@ def create_admin_config() -> None:
 
     # Generate SECRET_KEY for Flask config
     secret_key = secrets.token_urlsafe(32)
-    secret_key_description = """A secret key that will be used for securely signing the session cookie and can be used 
-    for any other security related needs by extensions or your application. It should be a long random bytes or str."""
+    secret_key_description = ('A secret key that will be used for securely signing the session cookie and can be used '
+                              'for any other security related needs by extensions or your application. '
+                              'It should be a long random bytes or str.')
 
     # Capture current datetime for creation and update timestamps
     current_datetime = datetime.datetime.now()

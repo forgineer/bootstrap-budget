@@ -66,6 +66,7 @@ def user_only(view):
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login() -> Response | str:
+    # TODO: Prevent users from being able to reach this after they have already logged in.
     if request.method == 'POST':
         form_username = request.form['username']
         form_password = request.form['password']
