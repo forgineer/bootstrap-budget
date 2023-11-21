@@ -5,7 +5,7 @@ from flask import (
 )
 
 # Import bootstrap-budget blueprints/modules/classes/functions
-from . import db
+from .auth import login_required
 
 
 # Define as a Flask blueprint: Admin
@@ -13,15 +13,18 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @bp.route("/")
-def admin_console():
+@login_required
+def index():
     return render_template('admin.html')
 
 
 @bp.route("/users")
-def users_console():
+@login_required
+def users():
     return render_template('users.html')
 
 
 @bp.route("/stop")
+@login_required
 def stop():
     return '<p>STOP!</p>'

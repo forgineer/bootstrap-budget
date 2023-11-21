@@ -2,6 +2,7 @@ import datetime
 import functools
 import sqlite3
 
+from dataclasses import dataclass
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
@@ -20,7 +21,6 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 @login_required
 def index() -> str:
     return render_template('dashboard.html')
-
 
 
 class Users:

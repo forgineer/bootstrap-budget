@@ -8,6 +8,18 @@ from importlib.resources import files
 from werkzeug.security import generate_password_hash
 
 
+def get_db() -> sqlite3.Connection | None:
+    """
+    Gets a connection to the Bootstrap Budget database (if exists).
+
+    :return: A SQLite connection to the Bootstrap Database. If the database does not exist, None is returned.
+    """
+    if os.path.exists('bootstrap_budget.db'):
+        return sqlite3.connect('bootstrap_budget.db')
+    else:
+        return None
+
+
 def create_schema() -> None:
     """
     Creates the Bootstrap Budget database schema. This is also used to reset the database schema as a DROP and REPLACE.
@@ -33,7 +45,7 @@ def create_admin_account() -> None:
     :return: None
     """
     create_user_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_user.sql').read_text()
-    db_connection: sqlite3.Connection = sqlite3.connect(f'bootstrap_budget.db')
+    db_connection: sqlite3.Connection = get_db()
     sql_cursor: sqlite3.Cursor = db_connection.cursor()
 
     EMPTY_STRING: str = ''
@@ -85,7 +97,7 @@ def create_admin_config() -> None:
     :return: None
     """
     create_config_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_config.sql').read_text()
-    db_connection: sqlite3.Connection = sqlite3.connect(f'bootstrap_budget.db')
+    db_connection: sqlite3.Connection = get_db()
     sql_cursor: sqlite3.Cursor = db_connection.cursor()
 
     EMPTY_STRING: str = ''
@@ -129,7 +141,7 @@ def reset_admin_password() -> None:
     :return: None
     """
     update_admin_statement: str = 'UPDATE USERS SET hash = ?, updated_dt_tm = ? WHERE username = "admin"'
-    db_connection: sqlite3.Connection = sqlite3.connect(f'bootstrap_budget.db')
+    db_connection: sqlite3.Connection = get_db()
     sql_cursor: sqlite3.Cursor = db_connection.cursor()
 
     admin_passwd = click.prompt(text='Enter admin password', type=str, default='admin',
@@ -157,23 +169,86 @@ def reset_admin_password() -> None:
         click.echo(e)
 
 
+def create_basic_user() -> None:
+    """
+    Creates a basic user (meets required fields) for the purposes of testing.
+
+    :return: None
+    """
+    create_user_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_user.sql').read_text()
+    db_connection: sqlite3.Connection = get_db()
+    sql_cursor: sqlite3.Cursor = db_connection.cursor()
+
+    EMPTY_STRING: str = ''
+    username: str | None = None
+
+    while username is None:
+        username = click.prompt(text='Enter new username', type=str, show_default=True)
+
+        user_id = sql_cursor.execute('SELECT id FROM USERS WHERE username = ?', [username]).fetchone()
+
+        if user_id is not None:
+            click.echo(f'The username "{username}" has already been taken. Please use a different username.')
+            username = None
+            continue
+
+    user_password = click.prompt(text=f'Enter password for {username}', type=str, default=f'{username}',
+                                 show_default=True, hide_input=True)
+
+    # Generate password hash and salt
+    hashed_password = generate_password_hash(user_password)
+
+    # Capture current datetime for creation and update timestamps
+    current_datetime = datetime.datetime.now()
+    current_datetime_iso = current_datetime.isoformat()
+
+    try:
+        response = sql_cursor.execute(create_user_statement, [
+            EMPTY_STRING,           # last_name
+            EMPTY_STRING,           # first_name
+            EMPTY_STRING,           # middle_name
+            username,               # username
+            EMPTY_STRING,           # address_line_1
+            EMPTY_STRING,           # address_line_2
+            EMPTY_STRING,           # city
+            EMPTY_STRING,           # state
+            EMPTY_STRING,           # zipcode
+            EMPTY_STRING,           # email
+            EMPTY_STRING,           # phone_number
+            hashed_password,        # hash
+            current_datetime_iso,   # created_dt_tm
+            current_datetime_iso,   # updated_dt_tm
+            True                    # is_active
+        ])
+
+        db_connection.commit()
+        db_connection.close()
+
+        click.echo(f'The user {username} has been created.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+
 @click.command()
 @click.option('--setup', is_flag=True, help='Creates the database schema, admin user, and base config.')
 @click.option('--reset-admin', is_flag=True, help='Reset admin password.')
 @click.option('--reset-bootstrap', is_flag=True, help='Reset your Bootstrap-Budget install (start over).')
+@click.option('--create-user', is_flag=True, help='Creates a basic user for testing purposes.')
 @click.option('--backup', is_flag=True, help='Backup all tables to CSV (password-protected zip file).')
-def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: bool) -> None:
+def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, create_user: bool, backup: bool) -> None:
     """
-    The Bootstrap Budegt command-line interface utility. Used for initial setup, reset, and backing up data.
+    The Bootstrap Budget command-line interface utility. Used for initial setup, reset, and backing up data.
 
     :param setup: Creates the database schema, admin user, and base config.
     :param reset_admin: Reset admin password.
     :param reset_bootstrap: Reset your Bootstrap-Budget install (start over).
+    :param create_user: Creates a basic user for testing purposes.
     :param backup: Backup all tables to CSV (password-protected zip file).
     :return: None
     """
     if setup or reset_bootstrap:
-        if os.path.exists('bootstrap_budget.db'):
+        if get_db() is not None:
             if reset_bootstrap:
                 if click.confirm('Resetting Bootstrap Budget means deleting all of your data and starting over. '
                                  'Are you sure you want to do this?'):
@@ -182,18 +257,26 @@ def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: boo
                     create_admin_config()
                     click.echo('Your Boostrap Budget install has been completely reset.')
             else:
-                click.echo('Bootstrap Budget has already setup. No action is needed.')
+                click.echo('Bootstrap Budget has already sbeen etup. No action is needed.')
         else:
             create_schema()
             create_admin_account()
             create_admin_config()
             click.echo('Your Boostrap Budget setup is complete!')
     elif reset_admin:
-        if click.confirm('You are about to reset your admin account. Are you sure you want to do this?'):
-            reset_admin_password()
+        if get_db() is not None:
+            if click.confirm('You are about to reset your admin account. Are you sure you want to do this?'):
+                reset_admin_password()
+        else:
+            click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
     elif backup:
         # TODO: Complete the backup feature
         click.echo('This does nothing right now, sorry :(')
+    elif create_user:
+        if get_db() is not None:
+            create_basic_user()
+        else:
+            click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
 
 
 if __name__ == '__main__':

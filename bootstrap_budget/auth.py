@@ -18,8 +18,6 @@ def login_required(view):
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('auth.login'))
-        #elif g.user['username'] == 'admin':
-        #    return redirect(url_for('admin.console'))
 
         return view(**kwargs)
 
@@ -67,14 +65,14 @@ def login() -> Response | str:
             session['user_id'] = user_id
             session['username'] = form_username
 
-            #if form_username == 'admin':
-            #    return redirect(url_for('admin.console'))
-            #else:
-            return redirect(url_for('dashboard.index'))
+            if form_username == 'admin':
+                return redirect(url_for('admin.index'))
+            else:
+                return redirect(url_for('dashboard.index'))
 
         flash(error)
 
-    return render_template('login2.html')
+    return render_template('login.html')
 
 
 @bp.route('/logout')
