@@ -3,7 +3,7 @@ import functools
 from flask import (
     abort, Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget blueprints/modules/classes/functions
 from .db import get_db
@@ -20,6 +20,30 @@ def login_required(view):
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
+
+    return wrapped_view
+
+
+def admin_only(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session['username'] == 'admin':
+            return view(**kwargs)
+        else:
+            return redirect(url_for('dashboard.index'))
+            #return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
+
+    return wrapped_view
+
+
+def user_only(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session['username'] != 'admin':
+            return view(**kwargs)
+        else:
+            return redirect(url_for('admin.index'))
+            #return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
 
     return wrapped_view
 
@@ -42,29 +66,7 @@ def load_logged_in_user() -> None:
         )
 
 
-def admin_only(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if session['username'] == 'admin':
-            return view(**kwargs)
-        else:
-            return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
-
-    return wrapped_view
-
-
-def user_only(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if session['username'] != 'admin':
-            return view(**kwargs)
-        else:
-            return abort(403)  # TODO: Go nowhere, or warn user that they do not have access.
-
-    return wrapped_view
-
-
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response | str:
     # TODO: Prevent users from being able to reach this after they have already logged in.
     if request.method == 'POST':

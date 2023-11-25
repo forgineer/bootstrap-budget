@@ -4,7 +4,9 @@ import os
 import secrets
 import sqlite3
 
+from bootstrap_budget import __version__
 from importlib.resources import files
+from typing import Any
 from werkzeug.security import generate_password_hash
 
 
@@ -170,11 +172,11 @@ def reset_admin_password() -> None:
         click.echo(e)
 
 
-def create_basic_user() -> None:
+def create_basic_user() -> int:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
-    :return: None
+    :return: The user_id of the newly inserted user.
     """
     create_user_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_user.sql').read_text()
     db_connection: sqlite3.Connection = get_db()
@@ -222,33 +224,203 @@ def create_basic_user() -> None:
             True                    # is_active
         ])
 
+        new_user_id: int = sql_cursor.lastrowid
+
         db_connection.commit()
         db_connection.close()
 
-        click.echo(f'The user {username} has been created.')
+        click.echo(f'The user "{username}" has been created.')
+
+        return new_user_id
     except Exception as e:
         # TODO: Find a better solution for handling this exception
         click.echo(e)
 
 
+def create_sample_data(user_id: int) -> None:
+    """
+    Creates a basic user (meets required fields) for the purposes of testing.
+
+    :return: The user_id of the newly inserted user.
+    """
+    # Gather sample data
+    budget_csv: str = files('bootstrap_budget').joinpath('db/sample_data/budget.csv').read_text()
+    budget_items_csv: str = files('bootstrap_budget').joinpath('db/sample_data/budget_items.csv').read_text()
+    accounts_csv: str = files('bootstrap_budget').joinpath('db/sample_data/accounts.csv').read_text()
+    transactions_csv: str = files('bootstrap_budget').joinpath('db/sample_data/transactions.csv').read_text()
+
+    # Gather insert statements
+    create_budget_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_budget.sql').read_text()
+    create_budget_items_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_budget_items.sql').read_text()
+    create_accounts_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_accounts.sql').read_text()
+    create_transactions_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_transactions.sql').read_text()
+
+    # Define DB connection
+    db_connection: sqlite3.Connection = get_db()
+    sql_cursor: sqlite3.Cursor = db_connection.cursor()
+
+    # Read and insert budget record(s)
+    budget_data: list[Any] = []
+    budget_records: list[Any] = budget_csv.split('\n')
+
+    for budget_record in enumerate(budget_records):
+        # Capture current datetime for creation and update timestamps
+        current_datetime = datetime.datetime.now()
+        current_datetime_iso = current_datetime.isoformat()
+
+        if budget_record[0] > 0:
+            record = budget_record[1].split(',')
+            record[2] = int(record[2])  # budget_year (conversion to int from str)
+            record.append(user_id)
+            record.append(current_datetime_iso)  # created_dt_tm
+            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(True)  # is_active
+            budget_data.append(record)
+
+    try:
+        response = sql_cursor.executemany(create_budget_statement, budget_data)
+
+        db_connection.commit()
+
+        click.echo(f'Sample BUDGET data has been inserted.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    # Read and insert budget item record(s)
+    budget_items_data: list[Any] = []
+    budget_items_records: list[Any] = budget_items_csv.split('\n')
+
+    for budget_item_record in enumerate(budget_items_records):
+        # Capture current datetime for creation and update timestamps
+        current_datetime = datetime.datetime.now()
+        current_datetime_iso = current_datetime.isoformat()
+
+        if budget_item_record[0] > 0:
+            record = budget_item_record[1].split(',')
+            record[2] = float(record[2])  # budget_amount (conversion to float from str)
+            record[3] = int(record[3])  # sequence (conversion to int from str)
+            record.append(user_id)
+            record.append(current_datetime_iso)  # created_dt_tm
+            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(True)  # is_active
+            budget_items_data.append(record)
+
+    try:
+        response = sql_cursor.executemany(create_budget_items_statement, budget_items_data)
+
+        db_connection.commit()
+
+        click.echo(f'Sample BUDGET_ITEMS data has been inserted.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    # Read and insert account record(s)
+    account_data: list[Any] = []
+    account_records: list[Any] = accounts_csv.split('\n')
+
+    for account_record in enumerate(account_records):
+        # Capture current datetime for creation and update timestamps
+        current_datetime = datetime.datetime.now()
+        current_datetime_iso = current_datetime.isoformat()
+
+        if account_record[0] > 0:
+            record = account_record[1].split(',')
+            record[4] = float(record[4])  # opening_amount (conversion to float from str)
+            record.append(user_id)
+            record.append(current_datetime_iso)  # created_dt_tm
+            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(True)  # is_active
+            account_data.append(record)
+
+    try:
+        response = sql_cursor.executemany(create_accounts_statement, account_data)
+
+        db_connection.commit()
+
+        click.echo(f'Sample ACCOUNTS data has been inserted.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    # Retrieve BUDGET_ITEM records as a lookup dictionary
+    budget_items_lookup: dict = {}
+
+    try:
+        response = sql_cursor.execute('SELECT id, name FROM BUDGET_ITEMS WHERE user_id = ?',
+                                      [user_id])
+        for value, key in response:
+            budget_items_lookup[key] = value
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    # Retrieve ACCOUNTS records as a lookup dictionary
+    accounts_lookup: dict = {}
+
+    try:
+        response = sql_cursor.execute('SELECT id, name FROM ACCOUNTS WHERE user_id = ?',
+                                      [user_id])
+        for value, key in response:
+            accounts_lookup[key] = value
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    # Read and insert transaction record(s)
+    transaction_data: list[Any] = []
+    transaction_records: list[Any] = transactions_csv.split('\n')
+
+    for transaction_record in enumerate(transaction_records):
+        # Capture current datetime for creation and update timestamps
+        current_datetime = datetime.datetime.now()
+        current_datetime_iso = current_datetime.isoformat()
+
+        if transaction_record[0] > 0:
+            record = transaction_record[1].split(',')
+            record[1] = float(record[1])  # amount (conversion to float from str)
+            record[4] = budget_items_lookup.get(record[4], None)  # budget_item_id (lookup from dict)
+            record[5] = accounts_lookup.get(record[5], None)  # budget_item_id (lookup from dict)
+            record.append(user_id)
+            record.append(current_datetime_iso)  # created_dt_tm
+            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(True)  # is_active
+            transaction_data.append(record)
+
+    try:
+        response = sql_cursor.executemany(create_transactions_statement, transaction_data)
+
+        db_connection.commit()
+
+        click.echo(f'Sample TRANSACTIONS data has been inserted.')
+    except Exception as e:
+        # TODO: Find a better solution for handling this exception
+        click.echo(e)
+
+    db_connection.close()
+
+
 @click.command()
+@click.option('--version', is_flag=True, help='Returns the current version of Bootstrap Budget installed.')
 @click.option('--setup', is_flag=True, help='Creates the database schema, admin user, and base config.')
 @click.option('--reset-admin', is_flag=True, help='Reset admin password.')
 @click.option('--reset-bootstrap', is_flag=True, help='Reset your Bootstrap-Budget install (start over).')
-@click.option('--create-user', is_flag=True, help='Creates a basic user for testing purposes.')
 @click.option('--backup', is_flag=True, help='Backup all tables to CSV (password-protected zip file).')
-def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, create_user: bool, backup: bool) -> None:
+def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: bool) -> None:
     """
     The Bootstrap Budget command-line interface utility. Used for initial setup, reset, and backing up data.
 
+    :param version: Returns the current version of Bootstrap Budget installed.
     :param setup: Creates the database schema, admin user, and base config.
     :param reset_admin: Reset admin password.
     :param reset_bootstrap: Reset your Bootstrap-Budget install (start over).
-    :param create_user: Creates a basic user for testing purposes.
     :param backup: Backup all tables to CSV (password-protected zip file).
     :return: None
     """
-    if setup or reset_bootstrap:
+    if version:
+        click.echo(f'bootstrap-budget v{__version__}')
+    elif setup or reset_bootstrap:
         if get_db() is not None:
             if reset_bootstrap:
                 if click.confirm('Resetting Bootstrap Budget means deleting all of your data and starting over. '
@@ -273,9 +445,28 @@ def bootstrap(setup: bool, reset_admin: bool, reset_bootstrap: bool, create_user
     elif backup:
         # TODO: Complete the backup feature
         click.echo('This does nothing right now, sorry :(')
-    elif create_user:
+
+
+@click.command('bootstrap-test')
+@click.option('--create-user', is_flag=True, help='Creates a basic user for testing purposes.')
+@click.option('--create-sample', is_flag=True, help='Inserts sample data set with test user.')
+def bootstrap_test(create_user: bool, create_sample: bool) -> None:
+    """
+    The Bootstrap Budget TEST command-line interface utility. Used for setting up test users and sample data.
+
+    :param create_user: Creates a basic user for testing purposes.
+    :param create_sample: Inserts sample data set with test user.
+    :return: None
+    """
+    if create_user:
         if get_db() is not None:
             create_basic_user()
+        else:
+            click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
+    elif create_sample:
+        if get_db() is not None:
+            user_id = create_basic_user()
+            create_sample_data(user_id=user_id)
         else:
             click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
 

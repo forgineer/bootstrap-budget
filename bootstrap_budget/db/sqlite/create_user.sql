@@ -1,6 +1,6 @@
-/**
- * Name: create_user.sql
- * Purpose: Creates a USER record.
+/*
+ * Name: create_users.sql
+ * Purpose: Creates USERS record(s).
  * Author: Blake Phillips (forgineer)
  */
 INSERT INTO USERS (

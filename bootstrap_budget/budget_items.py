@@ -5,7 +5,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from bootstrap_budget.db import get_db
+# Bootstrap Budget Imports
 from .auth import login_required, user_only
 
 

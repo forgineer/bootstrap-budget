@@ -1,4 +1,4 @@
-/**
+/*
  * Name: create_sqlite_schema.sql
  * Purpose: Creates the Bootstrap Budget table schema for SQLite.
  * Author: Blake Phillips (forgineer)
@@ -46,19 +46,21 @@ CREATE TABLE CONFIG (
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id),
+	UNIQUE(name, user_id)
 );
 --
 CREATE TABLE BUDGET (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT UNIQUE NOT NULL,
+	name TEXT NOT NULL,
 	description TEXT,
 	budget_year INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id),
+	UNIQUE(name, user_id)
 );
 --
 CREATE TABLE USER_BUDGET (
@@ -75,7 +77,7 @@ CREATE TABLE USER_BUDGET (
 --
 CREATE TABLE BUDGET_ITEMS (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT UNIQUE NOT NULL,
+	name TEXT NOT NULL,
 	description TEXT,
 	budget_amount REAL DEFAULT 0.0 NOT NULL,
 	sequence INTEGER DEFAULT 99 NOT NULL,
@@ -83,12 +85,13 @@ CREATE TABLE BUDGET_ITEMS (
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id),
+	UNIQUE(name, user_id)
 );
 --
 CREATE TABLE ACCOUNTS (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT UNIQUE NOT NULL,
+	name TEXT NOT NULL,
 	description TEXT,
 	account_number TEXT,
 	account_route_nbr TEXT,
@@ -97,7 +100,8 @@ CREATE TABLE ACCOUNTS (
 	created_dt_tm TEXT NOT NULL,
 	updated_dt_tm TEXT NOT NULL,
 	is_active INTEGER DEFAULT 1 NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES USERS (id)
+	FOREIGN KEY (user_id) REFERENCES USERS (id),
+	UNIQUE(name, user_id)
 
 );
 --
@@ -106,9 +110,9 @@ CREATE TABLE TRANSACTIONS (
 	description TEXT,
 	amount REAL DEFAULT 0.0 NOT NULL,
 	transaction_dt_tm TEXT NOT NULL,
-	transaction_year INTEGER GENERATED ALWAYS AS (STRFTIME('%Y', transaction_dt_tm)) VIRTUAL NOT NULL,
-	transaction_month INTEGER GENERATED ALWAYS AS (STRFTIME('%m', transaction_dt_tm)) VIRTUAL NOT NULL,
-	transaction_day INTEGER GENERATED ALWAYS AS (STRFTIME('%d', transaction_dt_tm)) VIRTUAL NOT NULL,
+	transaction_year INTEGER GENERATED ALWAYS AS (STRFTIME('%Y', transaction_dt_tm)) VIRTUAL,
+	transaction_month INTEGER GENERATED ALWAYS AS (STRFTIME('%m', transaction_dt_tm)) VIRTUAL,
+	transaction_day INTEGER GENERATED ALWAYS AS (STRFTIME('%d', transaction_dt_tm)) VIRTUAL,
 	note TEXT,
 	budget_item_id INTEGER DEFAULT 0 NOT NULL,
 	account_id INTEGER DEFAULT 0 NOT NULL,
