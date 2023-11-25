@@ -1,19 +1,22 @@
+import os
 import sqlite3
 
-from flask import g
+from flask import current_app, g
 
 
-def get_db() -> sqlite3.Connection:
+def get_db() -> sqlite3.Connection | None:
     """
     Create and/or retrieve the SQLite DB connection as a Flask global (g) property
 
-    :return: A SQLite connection
+    :return: A SQLite connection or None if the Db is not setup yet (raise error)
     """
     if 'db' not in g:
-       g.db = sqlite3.connect(database='bootstrap_budget.db',
-                              detect_types=sqlite3.PARSE_DECLTYPES)
-       g.db.row_factory = sqlite3.Row
-
+        if os.path.exists('bootstrap_budget.db'):
+            g.db = sqlite3.connect(database='bootstrap_budget.db',
+                                   detect_types=sqlite3.PARSE_DECLTYPES)
+            g.db.row_factory = sqlite3.Row
+        else:
+            return None
     return g.db
 
 

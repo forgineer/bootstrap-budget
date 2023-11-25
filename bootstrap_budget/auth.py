@@ -69,25 +69,24 @@ def load_logged_in_user() -> None:
 @bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response | str:
     # TODO: Prevent users from being able to reach this after they have already logged in.
+    error: str | None = None
+
     if request.method == 'POST':
         form_username = request.form['username']
         form_password = request.form['password']
 
         db = get_db()
 
-        error = None
+        user = db.execute('SELECT id, hash FROM USERS WHERE username = ?',[form_username]).fetchone()
 
-        user_id, password_hash = db.execute('SELECT id, hash FROM USERS WHERE username = ?',
-                                            [form_username]).fetchone()
-
-        if password_hash is None:
-            error = 'Incorrect username.'
-        elif not check_password_hash(password_hash, form_password):
-            error = 'Incorrect password.'
+        if user is None:
+            error = 'Incorrect username'
+        elif not check_password_hash(user['hash'], form_password):
+            error = 'Incorrect password'
 
         if error is None:
             session.clear()
-            session['user_id'] = user_id
+            session['user_id'] = user['id']
             session['username'] = form_username
 
             if form_username == 'admin':
@@ -95,9 +94,7 @@ def login() -> Response | str:
             else:
                 return redirect(url_for('dashboard.index'))
 
-        flash(error)
-
-    return render_template('login.html')
+    return render_template('login.html', error=error)
 
 
 @bp.route('/logout')

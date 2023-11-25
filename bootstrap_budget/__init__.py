@@ -1,8 +1,7 @@
 import importlib.metadata
 
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, g
 from logging.config import dictConfig
-from werkzeug.security import check_password_hash
 
 # Import Bootstrap Budget modules
 from . import accounts
@@ -12,6 +11,7 @@ from . import budget
 from . import budget_items
 from . import config
 from . import dashboard
+from . import db
 from . import transactions
 from . import users
 
@@ -50,8 +50,6 @@ def main() -> Flask:
     # Create and configure the app
     app = Flask(__name__)
 
-    # TODO: Extract and set SECRET_KEY from database config. If database or config not found, raise and exception to
-    #  prevent loading
     app.config.from_mapping(
         SECRET_KEY='dev'
     )
@@ -62,7 +60,6 @@ def main() -> Flask:
     app.register_blueprint(auth.bp)
     app.register_blueprint(budget.bp)
     app.register_blueprint(budget_items.bp)
-    #app.register_blueprint(config.bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(transactions.bp)
     app.register_blueprint(users.bp)

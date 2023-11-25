@@ -22,6 +22,19 @@ def get_db() -> sqlite3.Connection | None:
         return None
 
 
+def get_current_date_iso() -> str:
+    """
+    Generates a timestamp for the current date/time and returned in an ISO 8601 format.
+
+    :return: An ISO 8601 formatted timestamp of current.
+    """
+    # Capture current datetime for creation and update timestamps
+    current_datetime = datetime.datetime.now()
+    current_datetime_iso = current_datetime.isoformat()
+
+    return current_datetime_iso
+
+
 def create_schema() -> None:
     """
     Creates the Bootstrap Budget database schema. This is also used to reset the database schema as a DROP and REPLACE.
@@ -58,27 +71,23 @@ def create_admin_account() -> None:
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
-    # Capture current datetime for creation and update timestamps
-    current_datetime = datetime.datetime.now()
-    current_datetime_iso = current_datetime.isoformat()
-
     try:
-        response = sql_cursor.execute(create_user_statement, [
-            EMPTY_STRING,           # last_name
-            EMPTY_STRING,           # first_name
-            EMPTY_STRING,           # middle_name
-            'admin',                # username
-            EMPTY_STRING,           # address_line_1
-            EMPTY_STRING,           # address_line_2
-            EMPTY_STRING,           # city
-            EMPTY_STRING,           # state
-            EMPTY_STRING,           # zipcode
-            EMPTY_STRING,           # email
-            EMPTY_STRING,           # phone_number
-            hashed_password,        # hash
-            current_datetime_iso,   # created_dt_tm
-            current_datetime_iso,   # updated_dt_tm
-            True                    # is_active
+        response: sqlite3.Cursor = sql_cursor.execute(create_user_statement, [
+            EMPTY_STRING,               # last_name
+            EMPTY_STRING,               # first_name
+            EMPTY_STRING,               # middle_name
+            'admin',                    # username
+            EMPTY_STRING,               # address_line_1
+            EMPTY_STRING,               # address_line_2
+            EMPTY_STRING,               # city
+            EMPTY_STRING,               # state
+            EMPTY_STRING,               # zipcode
+            EMPTY_STRING,               # email
+            EMPTY_STRING,               # phone_number
+            hashed_password,            # hash
+            get_current_date_iso(),     # created_dt_tm
+            get_current_date_iso(),     # updated_dt_tm
+            True                        # is_active
         ])
 
         db_connection.commit()
@@ -112,20 +121,16 @@ def create_admin_config() -> None:
                               'for any other security related needs by extensions or your application. '
                               'It should be a long random bytes or str.')
 
-    # Capture current datetime for creation and update timestamps
-    current_datetime = datetime.datetime.now()
-    current_datetime_iso = current_datetime.isoformat()
-
     try:
-        response = sql_cursor.execute(create_config_statement, [
-            'SECRET_KEY',           # name
-            secret_key_description, # description
-            secret_key,             # config_value
-            TYPE_AFFINITY_TEXT,     # config_value_type
-            ADMIN_ID,               # user_id
-            current_datetime_iso,   # created_dt_tm
-            current_datetime_iso,   # updated_dt_tm
-            True                    # is_active
+        response: sqlite3.Cursor = sql_cursor.execute(create_config_statement, [
+            'SECRET_KEY',               # name
+            secret_key_description,     # description
+            secret_key,                 # config_value
+            TYPE_AFFINITY_TEXT,         # config_value_type
+            ADMIN_ID,                   # user_id
+            get_current_date_iso(),     # created_dt_tm
+            get_current_date_iso(),     # updated_dt_tm
+            True                        # is_active
         ])
 
         db_connection.commit()
@@ -153,14 +158,10 @@ def reset_admin_password() -> None:
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
-    # Capture current datetime for creation and update timestamps
-    current_datetime = datetime.datetime.now()
-    current_datetime_iso = current_datetime.isoformat()
-
     try:
-        response = sql_cursor.execute(update_admin_statement, [
-            hashed_password,        # hash
-            current_datetime_iso    # updated_dt_tm
+        response: sqlite3.Cursor = sql_cursor.execute(update_admin_statement, [
+            hashed_password,            # hash
+            get_current_date_iso()      # updated_dt_tm
         ])
 
         db_connection.commit()
@@ -188,42 +189,40 @@ def create_basic_user() -> int:
     while username is None:
         username = click.prompt(text='Enter new username', type=str, show_default=True)
 
-        user_id = sql_cursor.execute('SELECT id FROM USERS WHERE username = ?', [username]).fetchone()
+        user_id: int = sql_cursor.execute('SELECT id FROM USERS WHERE username = ?',
+                                          [username]).fetchone()
 
         if user_id is not None:
             click.echo(f'The username "{username}" has already been taken. Please use a different username.')
             username = None
             continue
 
-    user_password = click.prompt(text=f'Enter password for {username}', type=str, default=f'{username}',
-                                 show_default=True, hide_input=True)
+    user_password: str = click.prompt(text=f'Enter password for {username}', type=str, default=f'{username}',
+                                      show_default=True, hide_input=True)
 
     # Generate password hash and salt
-    hashed_password = generate_password_hash(user_password)
-
-    # Capture current datetime for creation and update timestamps
-    current_datetime = datetime.datetime.now()
-    current_datetime_iso = current_datetime.isoformat()
+    hashed_password: str = generate_password_hash(user_password)
 
     try:
-        response = sql_cursor.execute(create_user_statement, [
-            EMPTY_STRING,           # last_name
-            EMPTY_STRING,           # first_name
-            EMPTY_STRING,           # middle_name
-            username,               # username
-            EMPTY_STRING,           # address_line_1
-            EMPTY_STRING,           # address_line_2
-            EMPTY_STRING,           # city
-            EMPTY_STRING,           # state
-            EMPTY_STRING,           # zipcode
-            EMPTY_STRING,           # email
-            EMPTY_STRING,           # phone_number
-            hashed_password,        # hash
-            current_datetime_iso,   # created_dt_tm
-            current_datetime_iso,   # updated_dt_tm
-            True                    # is_active
+        response: sqlite3.Cursor = sql_cursor.execute(create_user_statement, [
+            EMPTY_STRING,               # last_name
+            EMPTY_STRING,               # first_name
+            EMPTY_STRING,               # middle_name
+            username,                   # username
+            EMPTY_STRING,               # address_line_1
+            EMPTY_STRING,               # address_line_2
+            EMPTY_STRING,               # city
+            EMPTY_STRING,               # state
+            EMPTY_STRING,               # zipcode
+            EMPTY_STRING,               # email
+            EMPTY_STRING,               # phone_number
+            hashed_password,            # hash
+            get_current_date_iso(),     # created_dt_tm
+            get_current_date_iso(),     # updated_dt_tm
+            True                        # is_active
         ])
 
+        # Retrieve the key generated from the insert
         new_user_id: int = sql_cursor.lastrowid
 
         db_connection.commit()
@@ -264,21 +263,17 @@ def create_sample_data(user_id: int) -> None:
     budget_records: list[Any] = budget_csv.split('\n')
 
     for budget_record in enumerate(budget_records):
-        # Capture current datetime for creation and update timestamps
-        current_datetime = datetime.datetime.now()
-        current_datetime_iso = current_datetime.isoformat()
-
         if budget_record[0] > 0:
-            record = budget_record[1].split(',')
+            record: list = budget_record[1].split(',')
             record[2] = int(record[2])  # budget_year (conversion to int from str)
             record.append(user_id)
-            record.append(current_datetime_iso)  # created_dt_tm
-            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(get_current_date_iso())  # created_dt_tm
+            record.append(get_current_date_iso())  # updated_dt_tm
             record.append(True)  # is_active
             budget_data.append(record)
 
     try:
-        response = sql_cursor.executemany(create_budget_statement, budget_data)
+        response: sqlite3.Cursor = sql_cursor.executemany(create_budget_statement, budget_data)
 
         db_connection.commit()
 
@@ -292,22 +287,18 @@ def create_sample_data(user_id: int) -> None:
     budget_items_records: list[Any] = budget_items_csv.split('\n')
 
     for budget_item_record in enumerate(budget_items_records):
-        # Capture current datetime for creation and update timestamps
-        current_datetime = datetime.datetime.now()
-        current_datetime_iso = current_datetime.isoformat()
-
         if budget_item_record[0] > 0:
-            record = budget_item_record[1].split(',')
+            record: list = budget_item_record[1].split(',')
             record[2] = float(record[2])  # budget_amount (conversion to float from str)
             record[3] = int(record[3])  # sequence (conversion to int from str)
             record.append(user_id)
-            record.append(current_datetime_iso)  # created_dt_tm
-            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(get_current_date_iso())  # created_dt_tm
+            record.append(get_current_date_iso())  # updated_dt_tm
             record.append(True)  # is_active
             budget_items_data.append(record)
 
     try:
-        response = sql_cursor.executemany(create_budget_items_statement, budget_items_data)
+        response: sqlite3.Cursor = sql_cursor.executemany(create_budget_items_statement, budget_items_data)
 
         db_connection.commit()
 
@@ -321,21 +312,17 @@ def create_sample_data(user_id: int) -> None:
     account_records: list[Any] = accounts_csv.split('\n')
 
     for account_record in enumerate(account_records):
-        # Capture current datetime for creation and update timestamps
-        current_datetime = datetime.datetime.now()
-        current_datetime_iso = current_datetime.isoformat()
-
         if account_record[0] > 0:
             record = account_record[1].split(',')
             record[4] = float(record[4])  # opening_amount (conversion to float from str)
             record.append(user_id)
-            record.append(current_datetime_iso)  # created_dt_tm
-            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(get_current_date_iso())  # created_dt_tm
+            record.append(get_current_date_iso())  # updated_dt_tm
             record.append(True)  # is_active
             account_data.append(record)
 
     try:
-        response = sql_cursor.executemany(create_accounts_statement, account_data)
+        response: sqlite3.Cursor = sql_cursor.executemany(create_accounts_statement, account_data)
 
         db_connection.commit()
 
@@ -348,7 +335,7 @@ def create_sample_data(user_id: int) -> None:
     budget_items_lookup: dict = {}
 
     try:
-        response = sql_cursor.execute('SELECT id, name FROM BUDGET_ITEMS WHERE user_id = ?',
+        response: sqlite3.Cursor = sql_cursor.execute('SELECT id, name FROM BUDGET_ITEMS WHERE user_id = ?',
                                       [user_id])
         for value, key in response:
             budget_items_lookup[key] = value
@@ -360,8 +347,8 @@ def create_sample_data(user_id: int) -> None:
     accounts_lookup: dict = {}
 
     try:
-        response = sql_cursor.execute('SELECT id, name FROM ACCOUNTS WHERE user_id = ?',
-                                      [user_id])
+        response: sqlite3.Cursor = sql_cursor.execute('SELECT id, name FROM ACCOUNTS WHERE user_id = ?',
+                                                      [user_id])
         for value, key in response:
             accounts_lookup[key] = value
     except Exception as e:
@@ -373,23 +360,19 @@ def create_sample_data(user_id: int) -> None:
     transaction_records: list[Any] = transactions_csv.split('\n')
 
     for transaction_record in enumerate(transaction_records):
-        # Capture current datetime for creation and update timestamps
-        current_datetime = datetime.datetime.now()
-        current_datetime_iso = current_datetime.isoformat()
-
         if transaction_record[0] > 0:
             record = transaction_record[1].split(',')
             record[1] = float(record[1])  # amount (conversion to float from str)
             record[4] = budget_items_lookup.get(record[4], None)  # budget_item_id (lookup from dict)
             record[5] = accounts_lookup.get(record[5], None)  # budget_item_id (lookup from dict)
             record.append(user_id)
-            record.append(current_datetime_iso)  # created_dt_tm
-            record.append(current_datetime_iso)  # updated_dt_tm
+            record.append(get_current_date_iso())  # created_dt_tm
+            record.append(get_current_date_iso())  # updated_dt_tm
             record.append(True)  # is_active
             transaction_data.append(record)
 
     try:
-        response = sql_cursor.executemany(create_transactions_statement, transaction_data)
+        response: sqlite3.Cursor = sql_cursor.executemany(create_transactions_statement, transaction_data)
 
         db_connection.commit()
 
@@ -467,6 +450,8 @@ def bootstrap_test(create_user: bool, create_sample: bool) -> None:
         if get_db() is not None:
             user_id = create_basic_user()
             create_sample_data(user_id=user_id)
+
+            click.echo('Sample data has been successfully inserted.')
         else:
             click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
 
