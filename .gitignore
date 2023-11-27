@@ -162,3 +162,4 @@ cython_debug/
 # Bootstrap-Budget specific files
 bootstrap-budget.iml
 bootstrap_budget.db
+config.py

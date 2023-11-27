@@ -1,6 +1,7 @@
 import importlib.metadata
+import sqlite3
 
-from flask import Flask, g
+from flask import Flask
 from logging.config import dictConfig
 
 # Import Bootstrap Budget modules
@@ -48,11 +49,21 @@ def main() -> Flask:
     :return: A Flask app (Bootstrap Budget)
     """
     # Create and configure the app
-    app = Flask(__name__)
+    # The instance folder is set to 'relative' in order to find the config file easily
+    app = Flask(__name__, instance_relative_config=True)
 
-    app.config.from_mapping(
-        SECRET_KEY='dev'
-    )
+    # Check to see if the database was set up through the CLI utility.
+    with app.app_context():
+        db_connection: sqlite3.Connection = db.get_db()
+
+        if db_connection is None:
+            raise RuntimeError('The Bootstrap Budget database has not been created. '
+                               'Use the "bootstrap --setup" CLI command to complete the installation.')
+
+    # Find the configuration file one level up from the instance folder (defined as relative)
+    # A configuration file should have been created from the 'boostrap --setup' CLI and contain
+    # the SECRET_KEY and any other configurations.
+    app.config.from_pyfile('../config.py')
 
     # Register Bootstrap Budget blueprints
     app.register_blueprint(accounts.bp)

@@ -99,47 +99,16 @@ def create_admin_account() -> None:
         click.echo(e)
 
 
-def create_admin_config() -> None:
+def create_config_file() -> None:
     """
-    Creates the admin related configurations on the CONFIG table.
-    Configurations created:
-        - SECRET_KEY
+    Creates a config file with a generated SECRET_KEY value for Flask.
 
     :return: None
     """
-    create_config_statement: str = files('bootstrap_budget').joinpath('db/sqlite/create_config.sql').read_text()
-    db_connection: sqlite3.Connection = get_db()
-    sql_cursor: sqlite3.Cursor = db_connection.cursor()
-
-    EMPTY_STRING: str = ''
-    TYPE_AFFINITY_TEXT: int = 2
-    ADMIN_ID: int = 1
-
-    # Generate SECRET_KEY for Flask config
     secret_key = secrets.token_urlsafe(32)
-    secret_key_description = ('A secret key that will be used for securely signing the session cookie and can be used '
-                              'for any other security related needs by extensions or your application. '
-                              'It should be a long random bytes or str.')
 
-    try:
-        response: sqlite3.Cursor = sql_cursor.execute(create_config_statement, [
-            'SECRET_KEY',               # name
-            secret_key_description,     # description
-            secret_key,                 # config_value
-            TYPE_AFFINITY_TEXT,         # config_value_type
-            ADMIN_ID,                   # user_id
-            get_current_date_iso(),     # created_dt_tm
-            get_current_date_iso(),     # updated_dt_tm
-            True                        # is_active
-        ])
-
-        db_connection.commit()
-        db_connection.close()
-
-        click.echo('The Bootstrap Budget SECRET_KEY has been configured.')
-    except Exception as e:
-        # TODO: Find a better solution for handling this exception
-        click.echo(e)
+    with open('config.py', 'w') as f:
+        f.write(f"SECRET_KEY = '{secret_key}'")
 
 
 def reset_admin_password() -> None:
@@ -289,8 +258,8 @@ def create_sample_data(user_id: int) -> None:
     for budget_item_record in enumerate(budget_items_records):
         if budget_item_record[0] > 0:
             record: list = budget_item_record[1].split(',')
-            record[2] = float(record[2])  # budget_amount (conversion to float from str)
-            record[3] = int(record[3])  # sequence (conversion to int from str)
+            record[2] = float(record[2])    # budget_amount (conversion to float from str)
+            record[3] = int(record[3])      # sequence (conversion to int from str)
             record.append(user_id)
             record.append(get_current_date_iso())  # created_dt_tm
             record.append(get_current_date_iso())  # updated_dt_tm
@@ -410,14 +379,14 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
                                  'Are you sure you want to do this?'):
                     create_schema()
                     create_admin_account()
-                    create_admin_config()
+                    create_config_file()
                     click.echo('Your Boostrap Budget install has been completely reset.')
             else:
                 click.echo('Bootstrap Budget has already sbeen etup. No action is needed.')
         else:
             create_schema()
             create_admin_account()
-            create_admin_config()
+            create_config_file()
             click.echo('Your Boostrap Budget setup is complete!')
     elif reset_admin:
         if get_db() is not None:

@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-from flask import current_app, g
+from flask import g
 
 
 def get_db() -> sqlite3.Connection | None:
