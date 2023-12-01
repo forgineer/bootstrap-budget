@@ -18,7 +18,7 @@ from . import users
 
 
 # Set Bootstrap Budget version
-__version__: str = importlib.metadata.version("bootstrap_budget")
+__version__: str = importlib.metadata.version('bootstrap_budget')
 
 
 dictConfig({
