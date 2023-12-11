@@ -63,7 +63,7 @@ def main() -> Flask:
     # Find the configuration file one level up from the instance folder (defined as relative)
     # A configuration file should have been created from the 'boostrap --setup' CLI and contain
     # the SECRET_KEY and any other configurations.
-    app.config.from_pyfile('../config.py')
+    app.config.from_pyfile('bootstrap_config.py')
 
     # Register Bootstrap Budget blueprints
     app.register_blueprint(accounts.bp)

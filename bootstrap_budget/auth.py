@@ -68,7 +68,9 @@ def load_logged_in_user() -> None:
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response | str:
-    # TODO: Prevent users from being able to reach this after they have already logged in.
+    # Clear the session from the very top in the event someone is manually returning to the login from another page.
+    session.clear()
+
     error: str | None = None
 
     if request.method == 'POST':

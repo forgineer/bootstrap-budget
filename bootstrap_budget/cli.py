@@ -107,7 +107,10 @@ def create_config_file() -> None:
     """
     secret_key = secrets.token_urlsafe(32)
 
-    with open('config.py', 'w') as f:
+    # Create the Flask instance directory
+    os.makedirs('instance', exist_ok=True)
+
+    with open('instance/bootstrap_config.py', 'w', ) as f:
         f.write(f"SECRET_KEY = '{secret_key}'")
 
 
