@@ -23,11 +23,10 @@ setup(
         'click==8.1.7',
         'colorama==0.4.6',
         'Flask==2.3.3',
-        'Flask-SQLAlchemy==3.1.1',
         'itsdangerous==2.1.2',
-        'Jinja2==3.1.2',
-        'MarkupSafe==2.1.3',
-        'waitress==2.1.2',
+        'Jinja2==3.1.3',
+        'MarkupSafe==2.1.5',
+        'pony==0.7.17',
         'Werkzeug==3.0.1'
     ],
     extras_require={  # pip install -e .[pypi_packaging]

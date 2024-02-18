@@ -8,16 +8,22 @@ from bootstrap_budget import __version__
 from importlib.resources import files
 from typing import Any
 from werkzeug.security import generate_password_hash
+from pony.orm import db_session
+
+from .entities import *
 
 
-def get_db() -> sqlite3.Connection | None:
+def get_db() -> Database().Entity | None:
     """
     Gets a connection to the Bootstrap Budget database (if exists).
 
     :return: A SQLite connection to the Bootstrap Database. If the database does not exist, None is returned.
     """
     if os.path.exists('bootstrap_budget.db'):
-        return sqlite3.connect('bootstrap_budget.db')
+        db = Database()
+        db.bind(provider='sqlite', filename='bootstrap_budget.db')
+
+        return db
     else:
         return None
 
@@ -41,15 +47,18 @@ def create_schema() -> None:
 
     :return: None
     """
-    db_schema_script: str = files('bootstrap_budget').joinpath('db/sqlite/create_sqlite_schema.sql').read_text()
-    db_connection: sqlite3.Connection = sqlite3.connect('bootstrap_budget.db')
-    sql_cursor: sqlite3.Cursor = db_connection.cursor()
+    cwd = os.getcwd()
+    db = Database()
 
-    # Iterate through each SQL statement in the file
-    for schema_definition in db_schema_script.split('--'):
-        response = sql_cursor.execute(schema_definition)
+    define_user_entity(db.Entity)
+    define_config_entity(db.Entity)
+    define_budget_entity(db.Entity)
+    define_budget_item_entity(db.Entity)
+    define_account_entity(db.Entity)
+    define_transaction_entity(db.Entity)
 
-    db_connection.close()
+    db.bind(provider='sqlite', filename=f'{cwd}\\bootstrap_budget.db', create_db=True)
+    db.generate_mapping(create_tables=True)
     click.echo('The Bootstrap Budget schema has been created.')
 
 
@@ -388,8 +397,8 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
                 click.echo('Bootstrap Budget has already sbeen etup. No action is needed.')
         else:
             create_schema()
-            create_admin_account()
-            create_config_file()
+            #create_admin_account()
+            #create_config_file()
             click.echo('Your Boostrap Budget setup is complete!')
     elif reset_admin:
         if get_db() is not None:

@@ -5,16 +5,16 @@ from flask import Flask
 from logging.config import dictConfig
 
 # Import Bootstrap Budget modules
-from . import accounts
+from . import account
 from . import admin
 from . import auth
 from . import budget
-from . import budget_items
+from . import budget_item
 from . import config
 from . import dashboard
 from . import db
-from . import transactions
-from . import users
+from . import transaction
+from . import user
 
 
 # Set Bootstrap Budget version
@@ -66,14 +66,14 @@ def main() -> Flask:
     app.config.from_pyfile('bootstrap_config.py')
 
     # Register Bootstrap Budget blueprints
-    app.register_blueprint(accounts.bp)
+    app.register_blueprint(account.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(budget.bp)
-    app.register_blueprint(budget_items.bp)
+    app.register_blueprint(budget_item.bp)
     app.register_blueprint(dashboard.bp)
-    app.register_blueprint(transactions.bp)
-    app.register_blueprint(users.bp)
+    app.register_blueprint(transaction.bp)
+    app.register_blueprint(user.bp)
 
     # Define the index entry point: The Boostrap Budget Dashboard
     app.add_url_rule("/", endpoint="dashboard.index")
