@@ -1,14 +1,16 @@
 from datetime import datetime
-from pony.orm import Database, Optional, PrimaryKey, Required, Set
+from pony.orm import Database, composite_key, Optional, PrimaryKey, Required, Set
 
 
-def define_user_entity(db_entity: Database().Entity) -> None:
+def define_entities(db_entity: Database().Entity) -> None:
     """
 
     :param db_entity:
-    :return:
+    :return: None
     """
     class User(db_entity):
+        _table_ = 'USER'
+
         id = PrimaryKey(int, auto=True)
         last_name = Optional(str, nullable=True)
         first_name = Optional(str, nullable=True)
@@ -25,20 +27,16 @@ def define_user_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime)
         is_active = Required(bool, default=True)
+        accounts = Set('Account')
         configs = Set('Config')
         budgets = Set('Budget')
         budget_items = Set('BudgetItem')
-        accounts = Set('Account')
         transactions = Set('Transaction')
+        user_budgets = Set('UserBudget')
 
-
-def define_config_entity(db_entity: Database().Entity) -> None:
-    """
-
-    :param db_entity:
-    :return:
-    """
     class Config(db_entity):
+        _table_ = 'CONFIG'
+
         id = PrimaryKey(int, auto=True)
         name = Required(str, unique=True)
         description = Optional(str, nullable=True)
@@ -47,16 +45,12 @@ def define_config_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime)
         is_active = Required(bool, default=True)
-        user = Required('User')
+        user_id = Required('User')
+        composite_key(name, user_id)
 
-
-def define_budget_entity(db_entity: Database().Entity) -> None:
-    """
-
-    :param db_entity:
-    :return:
-    """
     class Budget(db_entity):
+        _table_ = 'BUDGET'
+
         id = PrimaryKey(int, auto=True)
         name = Required(str)
         description = Optional(str, nullable=True)
@@ -64,16 +58,24 @@ def define_budget_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime)
         is_active = Required(bool, default=True)
-        user = Required('User')
+        user_id = Required('User')
+        user_budgets = Set('UserBudget')
+        composite_key(name, user_id)
 
+    class UserBudget(db_entity):
+        _table_ = 'USER_BUDGET'
 
-def define_budget_item_entity(db_entity: Database().Entity) -> None:
-    """
+        id = PrimaryKey(int, auto=True)
+        permissions = Required(int)
+        created_dt_tm = Required(datetime)
+        updated_dt_tm = Required(datetime)
+        is_active = Required(bool, default=True)
+        user_id = Required('User')
+        budget_id = Required('Budget')
 
-    :param db_entity:
-    :return:
-    """
     class BudgetItem(db_entity):
+        _table_ = 'BUDGET_ITEM'
+
         id = PrimaryKey(int, auto=True)
         name = Required(str)
         description = Optional(str, nullable=True)
@@ -82,17 +84,13 @@ def define_budget_item_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime)
         is_active = Required(bool, default=True)
-        user = Required('User')
+        user_id = Required('User')
         transactions = Set('Transaction')
+        composite_key(name, user_id)
 
-
-def define_account_entity(db_entity: Database().Entity) -> None:
-    """
-
-    :param db_entity:
-    :return:
-    """
     class Account(db_entity):
+        _table_ = 'ACCOUNT'
+
         id = PrimaryKey(int, auto=True)
         name = Required(str)
         description = Optional(str, nullable=True)
@@ -102,17 +100,13 @@ def define_account_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime)
         is_active = Required(bool, default=True)
-        user = Required('User')
+        user_id = Required('User')
         transactions = Set('Transaction')
+        composite_key(name, user_id)
 
-
-def define_transaction_entity(db_entity: Database().Entity) -> None:
-    """
-
-    :param db_entity:
-    :return:
-    """
     class Transaction(db_entity):
+        _table_ = 'TRANSACTION'
+
         id = PrimaryKey(int, auto=True)
         description = Optional(str, nullable=True)
         amount = Required(float, default=0)
@@ -121,6 +115,6 @@ def define_transaction_entity(db_entity: Database().Entity) -> None:
         created_dt_tm = Required(datetime)
         updated_dt_tm = Required(datetime, nullable=True)
         is_active = Required(bool, default=True)
-        account = Required('Account')
-        budget_item = Required('BudgetItem')
-        user = Required('User')
+        user_id = Required('User')
+        account_id = Required('Account')
+        budget_item_id = Required('BudgetItem')
