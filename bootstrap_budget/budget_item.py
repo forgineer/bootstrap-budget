@@ -1,5 +1,4 @@
-import functools
-
+from datetime import datetime
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
@@ -10,11 +9,11 @@ from .auth import login_required, user_only
 
 
 # Define as a Flask blueprint: User
-bp = Blueprint('transactions', __name__, url_prefix='/transactions')
+bp = Blueprint('budget_item', __name__, url_prefix='/budget-item')
 
 
 @bp.route("/")
 @login_required
 @user_only
 def index() -> str:
-    return render_template('transactions.html')
+    return render_template('budget-item.html')
