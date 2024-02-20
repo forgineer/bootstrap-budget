@@ -9,7 +9,7 @@ from .auth import login_required, user_only
 
 
 # Define as a Flask blueprint: User
-bp = Blueprint('account', __name__, url_prefix='/account')
+bp = Blueprint('account', __name__, url_prefix='/accounts')
 
 
 @bp.route("/")

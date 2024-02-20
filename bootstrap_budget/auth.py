@@ -61,7 +61,7 @@ def load_logged_in_user() -> None:
         g.user = None
     else:
         g.user = (
-            get_db().execute("SELECT * FROM USERS WHERE id = ?",
+            get_db().execute("SELECT * FROM USER WHERE id = ?",
                              (user_id,)).fetchone()
         )
 
@@ -79,7 +79,7 @@ def login() -> Response | str:
 
         db = get_db()
 
-        user = db.execute('SELECT id, hash FROM USERS WHERE username = ?',[form_username]).fetchone()
+        user = db.execute('SELECT id, hash FROM USER WHERE username = ?',[form_username]).fetchone()
 
         if user is None:
             error = 'Incorrect username'

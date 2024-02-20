@@ -10,7 +10,6 @@ from . import admin
 from . import auth
 from . import budget
 from . import budget_item
-from . import config
 from . import dashboard
 from . import db
 from . import transaction

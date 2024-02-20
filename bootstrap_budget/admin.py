@@ -25,7 +25,7 @@ def index():
 @login_required
 @admin_only
 def users():
-    return render_template('users.html')
+    return render_template('user_admin.html')
 
 
 @bp.route("/shutdown", methods=['POST'])
@@ -39,7 +39,7 @@ def shutdown():
 
         error = None
 
-        password_hash = db.execute('SELECT hash FROM USERS WHERE username = "admin"').fetchone()
+        password_hash = db.execute('SELECT hash FROM USER WHERE username = "admin"').fetchone()
 
         if check_password_hash(password_hash, form_password):
             current_app.logger.info('Admin password checks out. Trying to shutdown...')

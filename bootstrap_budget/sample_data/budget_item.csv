@@ -1,4 +1,4 @@
-name,description,budget_amount,sequence
+name,description,budget_amount,sequence_order
 Income,Household income,4000.00,1
 Entertainment,Games - movies - and other subscriptions,200.00,2
 Housing,Mortgage or rent payment,800.00,3

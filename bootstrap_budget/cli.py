@@ -170,7 +170,7 @@ def create_sample_data(db: Database().Entity, user: str) -> None:
             db.BudgetItem(name=budget_item['name'],
                           description=budget_item['description'],
                           budget_amount=float(budget_item['budget_amount']),
-                          sequence=int(budget_item['sequence']),
+                          sequence_order=int(budget_item['sequence_order']),
                           created_dt_tm=datetime.now(),
                           updated_dt_tm=datetime.now(),
                           user_id=user.id)
@@ -190,6 +190,8 @@ def create_sample_data(db: Database().Entity, user: str) -> None:
                        user_id=user.id)
 
     # Retrieve ACCOUNT and BUDGET_ITEM records as a lookup dictionaries
+    # TODO: Find a better way to address looking up foreign key value
+    # TODO: There should be a way to query dynamically with Pony
     accounts_lookup: dict = {}
     budget_items_lookup: dict = {}
 
