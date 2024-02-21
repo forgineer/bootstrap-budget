@@ -226,8 +226,10 @@ def create_sample_data(db: Database().Entity, user: str) -> None:
 @click.option('--setup', is_flag=True, help='Creates the database schema, admin user, and base config.')
 @click.option('--reset-admin', is_flag=True, help='Reset admin password.')
 @click.option('--reset-bootstrap', is_flag=True, help='Reset your Bootstrap-Budget install (start over).')
-@click.option('--backup', is_flag=True, help='Backup all tables to CSV (password-protected zip file).')
-def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: bool) -> None:
+@click.option('--backup', is_flag=True, help='Backup all tables to CSVs (password-protected zip file).')
+@click.option('--restore', is_flag=True, help='Restore all backed up data from CSVs (password-protected zip file).')
+def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bool, backup: bool,
+              restore: bool) -> None:
     """
     The Bootstrap Budget command-line interface utility. Used for initial setup, reset, and backing up data.
 
@@ -235,7 +237,8 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
     :param setup: Creates the database schema, admin user, and base config.
     :param reset_admin: Reset admin password.
     :param reset_bootstrap: Reset your Bootstrap-Budget install (start over).
-    :param backup: Backup all tables to CSV (password-protected zip file).
+    :param backup: Backup all tables to CSVs (password-protected zip file).
+    :param restore: Restore all backed up data from CSVs (password-protected zip file).
     :return: None
     """
     if version:
@@ -258,6 +261,11 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
                     reset_admin_password(db)
             elif backup:
                 # TODO: Complete the backup feature
+                # TODO: Include bootstrap_config.py file. This file should include the version of bootstrap-budget.
+                click.echo('This does nothing right now, sorry :(')
+            elif restore:
+                # TODO: Complete the restore feature
+                # TODO: This should accept the zip file created by the backup feature.
                 click.echo('This does nothing right now, sorry :(')
             else:
                 click.echo('Your Boostrap Budget setup is already complete!')

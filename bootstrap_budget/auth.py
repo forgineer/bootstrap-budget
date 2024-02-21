@@ -79,7 +79,8 @@ def login() -> Response | str:
 
         db = get_db()
 
-        user = db.execute('SELECT id, hash FROM USER WHERE username = ?',[form_username]).fetchone()
+        user = db.execute('SELECT id, hash FROM USER WHERE is_active = TRUE and username = ?',
+                          [form_username]).fetchone()
 
         if user is None:
             error = 'Incorrect username'
