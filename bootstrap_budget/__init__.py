@@ -61,6 +61,8 @@ class User(db.Entity):
     budget_items = orm.Set('BudgetItem')
     transactions = orm.Set('Transaction')
     user_budgets = orm.Set('UserBudget')
+
+
 """
 CREATE TABLE "USER" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,6 +98,8 @@ class Config(db.Entity):
     is_active = orm.Required(bool, default=True)
     user_id = orm.Required(User)
     orm.composite_key(name, user_id)
+
+
 """
 CREATE TABLE "CONFIG" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,6 +131,8 @@ class Budget(db.Entity):
     user_id = orm.Required(User)
     user_budgets = orm.Set('UserBudget')
     orm.composite_key(name, user_id)
+
+
 """
 CREATE TABLE "BUDGET" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -154,6 +160,8 @@ class UserBudget(db.Entity):
     is_active = orm.Required(bool, default=True)
     user_id = orm.Required(User)
     budget_id = orm.Required(Budget)
+
+
 """
 CREATE TABLE "USER_BUDGET" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -183,6 +191,8 @@ class BudgetItem(db.Entity):
     user_id = orm.Required(User)
     transactions = orm.Set('Transaction')
     orm.composite_key(name, user_id)
+
+
 """
 CREATE TABLE "BUDGET_ITEM" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -216,6 +226,8 @@ class Account(db.Entity):
     user_id = orm.Required(User)
     transactions = orm.Set('Transaction')
     orm.composite_key(name, user_id)
+
+
 """
 CREATE TABLE "ACCOUNT" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -249,6 +261,8 @@ class Transaction(db.Entity):
     user_id = orm.Required(User)
     account_id = orm.Required(Account)
     budget_item_id = orm.Required(BudgetItem)
+
+
 """
 CREATE TABLE "TRANSACTION" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
