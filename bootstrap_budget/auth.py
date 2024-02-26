@@ -6,7 +6,7 @@ from flask import (
 from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget blueprints/modules/classes/functions
-from .db import get_db
+from . import User
 
 
 # Define as a Flask blueprint: Auth
@@ -60,10 +60,7 @@ def load_logged_in_user() -> None:
     if user_id is None:
         g.user = None
     else:
-        g.user = (
-            get_db().execute("SELECT * FROM USER WHERE id = ?",
-                             (user_id,)).fetchone()
-        )
+        g.user = User.get(id=user_id)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -77,19 +74,16 @@ def login() -> Response | str:
         form_username = request.form['username']
         form_password = request.form['password']
 
-        db = get_db()
-
-        user = db.execute('SELECT id, hash FROM USER WHERE is_active = TRUE and username = ?',
-                          [form_username]).fetchone()
+        user = User.get(username=form_username)
 
         if user is None:
             error = 'Incorrect username'
-        elif not check_password_hash(user['hash'], form_password):
+        elif not check_password_hash(user.hash, form_password):
             error = 'Incorrect password'
 
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user.id
             session['username'] = form_username
 
             if form_username == 'admin':

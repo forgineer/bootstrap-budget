@@ -1,4 +1,6 @@
 import functools
+import os
+import signal
 
 from flask import (
     Blueprint, current_app, flash, g, redirect, render_template, request, session, url_for
@@ -7,7 +9,6 @@ from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget blueprints/modules/classes/functions
 from .auth import login_required, admin_only
-from .db import get_db
 
 
 # Define as a Flask blueprint: Admin
@@ -33,13 +34,5 @@ def users():
 @admin_only
 def shutdown():
     if request.method == 'POST':
-        form_password = request.form['password']
-
-        db = get_db()
-
-        error = None
-
-        password_hash = db.execute('SELECT hash FROM USER WHERE username = "admin"').fetchone()
-
-        if check_password_hash(password_hash, form_password):
-            current_app.logger.info('Admin password checks out. Trying to shutdown...')
+        current_app.logger.info('Admin password checks out. Trying to shutdown...')
+        #os.kill(os.getpid(), signal.SIGINT)

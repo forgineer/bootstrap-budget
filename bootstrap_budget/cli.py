@@ -1,27 +1,43 @@
 import click
 import csv
 import os
+import re
 import secrets
 
-from bootstrap_budget import __version__, sample_data, schema
+from bootstrap_budget import __version__, sample_data
 from datetime import datetime
-from pony.orm import Database, db_session, select
+from pony import orm
 from werkzeug.security import generate_password_hash
 
-# Pony needs the current working directory in order to place the database outside of site_packages
+# Pony does not assume the current working directory when defining the database filepath.
+# To place the database outside of site_packages we must define our working directory.
 CURRENT_WORKING_DIRECTORY = os.getcwd()
+SQLITE_DATABASE = 'bootstrap_budget.db'
+SQLITE_DATABASE_FILE_PATH = os.path.join(CURRENT_WORKING_DIRECTORY, SQLITE_DATABASE).replace('\\', '\\\\')
 
 
-def get_db() -> Database().Entity | None:
+def define_db_entities() -> orm.Database().Entity:
+    """
+    Defines the Bootstrap-Budget schema in the form of class objects for mapping to the database.
+
+    :return: A database entity object (Pony ORM).
+    """
+    from . import (
+        db, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
+    )
+
+    return db
+
+
+def get_db() -> orm.Database().Entity | None:
     """
     Gets a connection to the Bootstrap Budget database (if exists).
 
     :return: A SQLite connection to the Bootstrap Database. If the database does not exist, None is returned.
     """
-    if os.path.exists('bootstrap_budget.db'):
-        db = Database()
-        schema.define_entities(db.Entity)
-        db.bind(provider='sqlite', filename=f'{CURRENT_WORKING_DIRECTORY}\\bootstrap_budget.db')
+    if os.path.exists(SQLITE_DATABASE_FILE_PATH):
+        db = define_db_entities()
+        db.bind(provider='sqlite', filename=SQLITE_DATABASE_FILE_PATH)
         db.generate_mapping()
 
         return db
@@ -29,8 +45,8 @@ def get_db() -> Database().Entity | None:
         return None
 
 
-@db_session
-def create_admin_account(db: Database().Entity) -> None:
+@orm.db_session
+def create_admin_account(db: orm.Database().Entity) -> None:
     """
     Creates the admin account on the USER table.
 
@@ -47,6 +63,7 @@ def create_admin_account(db: Database().Entity) -> None:
                         hash=hashed_password,
                         created_dt_tm=datetime.now(),
                         updated_dt_tm=datetime.now())
+        orm.commit()
         click.echo('The Bootstrap Budget admin account has been created.')
     except Exception as e:
         # TODO: Find a better solution for handling this exception
@@ -65,13 +82,14 @@ def create_config_file() -> None:
     os.makedirs('instance', exist_ok=True)
 
     with open('instance/bootstrap_config.py', 'w', ) as f:
-        f.write(f"SECRET_KEY = '{secret_key}'")
+        f.write(f"SECRET_KEY = '{secret_key}'\n")
+        f.write(f"PONY = {{'provider': 'sqlite', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
 
     click.echo("The Bootstrap configuration file has been created.")
 
 
-@db_session
-def reset_admin_password(db: Database().Entity) -> None:
+@orm.db_session
+def reset_admin_password(db: orm.Database().Entity) -> None:
     """
     Resets the admin account password.
 
@@ -92,8 +110,8 @@ def reset_admin_password(db: Database().Entity) -> None:
         click.echo(e)
 
 
-@db_session
-def create_basic_user(db: Database().Entity) -> str:
+@orm.db_session
+def create_basic_user(db: orm.Database().Entity) -> str:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
@@ -124,6 +142,7 @@ def create_basic_user(db: Database().Entity) -> str:
                            hash=hashed_password,
                            created_dt_tm=datetime.now(),
                            updated_dt_tm=datetime.now())
+            orm.commit()
             click.echo(f'The user "{username}" has been created.')
         except Exception as e:
             # TODO: Find a better solution for handling this exception
@@ -132,8 +151,8 @@ def create_basic_user(db: Database().Entity) -> str:
     return username
 
 
-@db_session
-def create_sample_data(db: Database().Entity, user: str) -> None:
+@orm.db_session
+def create_sample_data(db: orm.Database().Entity, user: str) -> None:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
@@ -195,11 +214,11 @@ def create_sample_data(db: Database().Entity, user: str) -> None:
     accounts_lookup: dict = {}
     budget_items_lookup: dict = {}
 
-    accounts = select(a for a in db.Account if a.user_id == user)
+    accounts = orm.select(a for a in db.Account if a.user_id == user)
     for account in accounts:
         accounts_lookup[account.name] = account.id
 
-    budget_items = select(bi for bi in db.BudgetItem if bi.user_id == user)
+    budget_items = orm.select(bi for bi in db.BudgetItem if bi.user_id == user)
     for budget_item in budget_items:
         budget_items_lookup[budget_item.name] = budget_item.id
 
@@ -271,9 +290,8 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
                 click.echo('Your Boostrap Budget setup is already complete!')
         else:
             if setup:
-                db = Database()
-                schema.define_entities(db.Entity)
-                db.bind(provider='sqlite', filename=f'{CURRENT_WORKING_DIRECTORY}\\bootstrap_budget.db', create_db=True)
+                db = define_db_entities()
+                db.bind(provider='sqlite', filename=SQLITE_DATABASE_FILE_PATH, create_db=True)
                 db.generate_mapping(create_tables=True)
                 click.echo('The Bootstrap Budget schema has been created.')
                 create_admin_account(db)
@@ -296,7 +314,7 @@ def bootstrap_test(create_user: bool, create_sample: bool) -> None:
     """
     db = get_db()
 
-    if get_db() is not None:
+    if db is not None:
         if create_user:
             create_basic_user(db)
         elif create_sample:

@@ -8,7 +8,7 @@ with open("README.md") as f:
 
 setup(
     name='bootstrap-budget',
-    version='0.1.1',
+    version='0.1.2',
     author='forgineer',
     description='A simple financial application to help you pull your budget up by its bootstraps.',
     long_description=long_description,
@@ -29,7 +29,7 @@ setup(
         'pony==0.7.17',
         'Werkzeug==3.0.1'
     ],
-    extras_require={  # pip install -e .[pypi_packaging]
+    extras_require={  # pip install -e .[deployment]
         'deployment': [
             'build',
             'twine'
