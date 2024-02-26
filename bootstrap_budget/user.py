@@ -16,5 +16,5 @@ bp = Blueprint('user', __name__, url_prefix='/user')
 @bp.route("/")
 @login_required
 @user_only
-def index() -> str:
+def index() -> Response | str:
     return render_template('dashboard.html')

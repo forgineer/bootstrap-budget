@@ -15,5 +15,5 @@ bp = Blueprint('budget_item', __name__, url_prefix='/budget-items')
 @bp.route("/")
 @login_required
 @user_only
-def index() -> str:
+def index() -> Response | str:
     return render_template('budget-item.html')

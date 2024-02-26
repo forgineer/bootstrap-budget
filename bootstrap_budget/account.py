@@ -14,5 +14,5 @@ bp = Blueprint('account', __name__, url_prefix='/accounts')
 @bp.route("/")
 @login_required
 @user_only
-def index() -> str:
+def index() -> Response | str:
     return render_template('account.html')

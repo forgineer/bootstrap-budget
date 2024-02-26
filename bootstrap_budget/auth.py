@@ -3,6 +3,7 @@ import functools
 from flask import (
     abort, Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 )
+from typing import Any
 from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget blueprints/modules/classes/functions
@@ -13,7 +14,7 @@ from . import User
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-def login_required(view):
+def login_required(view) -> Any:
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
@@ -24,7 +25,7 @@ def login_required(view):
     return wrapped_view
 
 
-def admin_only(view):
+def admin_only(view) -> Any:
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session['username'] == 'admin':
@@ -36,7 +37,7 @@ def admin_only(view):
     return wrapped_view
 
 
-def user_only(view):
+def user_only(view) -> Any:
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session['username'] != 'admin':

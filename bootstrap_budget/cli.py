@@ -1,7 +1,6 @@
 import click
 import csv
 import os
-import re
 import secrets
 
 from bootstrap_budget import __version__, sample_data
@@ -152,7 +151,7 @@ def create_basic_user(db: orm.Database().Entity) -> str:
 
 
 @orm.db_session
-def create_sample_data(db: orm.Database().Entity, user: str) -> None:
+def create_sample_data(db: orm.Database().Entity, username: str) -> None:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
@@ -167,7 +166,7 @@ def create_sample_data(db: orm.Database().Entity, user: str) -> None:
     account_csv_path: str = f'{sample_data_dir}\\account.csv'
     transaction_csv_path: str = f'{sample_data_dir}\\transaction.csv'
 
-    user = db.User.get(username=user)
+    user = db.User.get(username=username)
 
     # Insert BUDGET records
     with open(budget_csv_path, mode='r') as csv_file:
