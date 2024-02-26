@@ -8,11 +8,18 @@ from datetime import datetime
 from pony import orm
 from werkzeug.security import generate_password_hash
 
+
+# Define standard provider and filename for SQLite database integration
+PROVIDER_SQLITE = 'sqlite'
+SQLITE_DATABASE = 'bootstrap_budget.db'
+
 # Pony does not assume the current working directory when defining the database filepath.
 # To place the database outside of site_packages we must define our working directory.
 CURRENT_WORKING_DIRECTORY = os.getcwd()
-SQLITE_DATABASE = 'bootstrap_budget.db'
 SQLITE_DATABASE_FILE_PATH = os.path.join(CURRENT_WORKING_DIRECTORY, SQLITE_DATABASE).replace('\\', '\\\\')
+
+# Define 'admin' default username/password
+ADMIN = 'admin'
 
 
 def define_db_entities() -> orm.Database().Entity:
@@ -36,7 +43,7 @@ def get_db() -> orm.Database().Entity | None:
     """
     if os.path.exists(SQLITE_DATABASE_FILE_PATH):
         db = define_db_entities()
-        db.bind(provider='sqlite', filename=SQLITE_DATABASE_FILE_PATH)
+        db.bind(provider=PROVIDER_SQLITE, filename=SQLITE_DATABASE_FILE_PATH)
         db.generate_mapping()
 
         return db
@@ -51,14 +58,14 @@ def create_admin_account(db: orm.Database().Entity) -> None:
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password', type=str, default='admin',
+    admin_passwd = click.prompt(text='Enter admin password', type=str, default=ADMIN,
                                 show_default=True, hide_input=True)
 
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
     try:
-        admin = db.User(username='admin',
+        admin = db.User(username=ADMIN,
                         hash=hashed_password,
                         created_dt_tm=datetime.now(),
                         updated_dt_tm=datetime.now())
@@ -82,7 +89,7 @@ def create_config_file() -> None:
 
     with open('instance/bootstrap_config.py', 'w', ) as f:
         f.write(f"SECRET_KEY = '{secret_key}'\n")
-        f.write(f"PONY = {{'provider': 'sqlite', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
+        f.write(f"PONY = {{'provider': '{PROVIDER_SQLITE}', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
 
     click.echo("The Bootstrap configuration file has been created.")
 
@@ -94,14 +101,14 @@ def reset_admin_password(db: orm.Database().Entity) -> None:
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password', type=str, default='admin',
+    admin_passwd = click.prompt(text='Enter admin password', type=str, default=ADMIN,
                                 show_default=True, hide_input=True)
 
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
     try:
-        admin = db.User.get(username='admin')
+        admin = db.User.get(username=ADMIN)
         admin.hash = hashed_password
         click.echo('The Bootstrap Budget admin password has been reset.')
     except Exception as e:
@@ -130,7 +137,7 @@ def create_basic_user(db: orm.Database().Entity) -> str:
             click.echo('The username entered already exists. Please choose a different username.')
             exit(1)
 
-        user_password: str = click.prompt(text=f'Enter password for {username}', type=str, default=f'{username}',
+        user_password: str = click.prompt(text=f'Enter password for {username}', type=str, default=username,
                                           show_default=True, hide_input=True)
 
         # Generate password hash and salt
@@ -290,7 +297,7 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
         else:
             if setup:
                 db = define_db_entities()
-                db.bind(provider='sqlite', filename=SQLITE_DATABASE_FILE_PATH, create_db=True)
+                db.bind(provider=PROVIDER_SQLITE, filename=SQLITE_DATABASE_FILE_PATH, create_db=True)
                 db.generate_mapping(create_tables=True)
                 click.echo('The Bootstrap Budget schema has been created.')
                 create_admin_account(db)
