@@ -168,10 +168,10 @@ def create_sample_data(db: orm.Database().Entity, username: str) -> None:
     sample_data_path = sample_data.__file__
     sample_data_dir = os.path.dirname(sample_data_path)
 
-    budget_csv_path: str = f'{sample_data_dir}\\budget.csv'
-    budget_item_csv_path: str = f'{sample_data_dir}\\budget_item.csv'
-    account_csv_path: str = f'{sample_data_dir}\\account.csv'
-    transaction_csv_path: str = f'{sample_data_dir}\\transaction.csv'
+    budget_csv_path: str = os.path.join(sample_data_dir, 'budget.csv')
+    budget_item_csv_path: str = os.path.join(sample_data_dir, 'budget_item.csv')
+    account_csv_path: str = os.path.join(sample_data_dir, 'account.csv')
+    transaction_csv_path: str = os.path.join(sample_data_dir, 'transaction.csv')
 
     user = db.User.get(username=username)
 
