@@ -3,36 +3,24 @@ import csv
 import os
 import secrets
 
-from bootstrap_budget import __version__, sample_data
+from bootstrap_budget import __admin__, __version__, sample_data
 from datetime import datetime
 from pony import orm
 from werkzeug.security import generate_password_hash
 
+# Define database and entities (Pony ORM)
+from .entities import (
+    db as database, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
+)
 
 # Define standard provider and filename for SQLite database integration
-PROVIDER_SQLITE = 'sqlite'
+SQLITE_PROVIDER = 'sqlite'
 SQLITE_DATABASE = 'bootstrap_budget.db'
 
 # Pony does not assume the current working directory when defining the database filepath.
 # To place the database outside of site_packages we must define our working directory.
 CURRENT_WORKING_DIRECTORY = os.getcwd()
 SQLITE_DATABASE_FILE_PATH = os.path.join(CURRENT_WORKING_DIRECTORY, SQLITE_DATABASE).replace('\\', '\\\\')
-
-# Define 'admin' default username/password
-ADMIN = 'admin'
-
-
-def define_db_entities() -> orm.Database().Entity:
-    """
-    Defines the Bootstrap-Budget schema in the form of class objects for mapping to the database.
-
-    :return: A database entity object (Pony ORM).
-    """
-    from . import (
-        db, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
-    )
-
-    return db
 
 
 def get_db() -> orm.Database().Entity | None:
@@ -42,33 +30,32 @@ def get_db() -> orm.Database().Entity | None:
     :return: A SQLite connection to the Bootstrap Database. If the database does not exist, None is returned.
     """
     if os.path.exists(SQLITE_DATABASE_FILE_PATH):
-        db = define_db_entities()
-        db.bind(provider=PROVIDER_SQLITE, filename=SQLITE_DATABASE_FILE_PATH)
-        db.generate_mapping()
+        database.bind(provider=SQLITE_PROVIDER, filename=SQLITE_DATABASE_FILE_PATH)
+        database.generate_mapping()
 
-        return db
+        return database
     else:
         return None
 
 
 @orm.db_session
-def create_admin_account(db: orm.Database().Entity) -> None:
+def create_admin_account(db_entity: orm.Database().Entity) -> None:
     """
     Creates the admin account on the USER table.
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password', type=str, default=ADMIN,
+    admin_passwd = click.prompt(text='Enter admin password', type=str, default=__admin__,
                                 show_default=True, hide_input=True)
 
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
     try:
-        admin = db.User(username=ADMIN,
-                        hash=hashed_password,
-                        created_dt_tm=datetime.now(),
-                        updated_dt_tm=datetime.now())
+        admin = db_entity.User(username=__admin__,
+                               hash=hashed_password,
+                               created_dt_tm=datetime.now(),
+                               updated_dt_tm=datetime.now())
         orm.commit()
         click.echo('The Bootstrap Budget admin account has been created.')
     except Exception as e:
@@ -89,26 +76,27 @@ def create_config_file() -> None:
 
     with open('instance/bootstrap_config.py', 'w', ) as f:
         f.write(f"SECRET_KEY = '{secret_key}'\n")
-        f.write(f"PONY = {{'provider': '{PROVIDER_SQLITE}', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
+        f.write(f"PONY = {{'provider': '{SQLITE_PROVIDER}', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
 
     click.echo("The Bootstrap configuration file has been created.")
 
 
 @orm.db_session
-def reset_admin_password(db: orm.Database().Entity) -> None:
+def reset_admin_password(db_entity: orm.Database().Entity) -> None:
     """
     Resets the admin account password.
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password', type=str, default=ADMIN,
+    admin_passwd = click.prompt(text='Enter admin password',
+                                type=str, default=__admin__,
                                 show_default=True, hide_input=True)
 
     # Generate password hash and salt
     hashed_password = generate_password_hash(admin_passwd)
 
     try:
-        admin = db.User.get(username=ADMIN)
+        admin = db_entity.User.get(username=__admin__)
         admin.hash = hashed_password
         click.echo('The Bootstrap Budget admin password has been reset.')
     except Exception as e:
@@ -117,7 +105,7 @@ def reset_admin_password(db: orm.Database().Entity) -> None:
 
 
 @orm.db_session
-def create_basic_user(db: orm.Database().Entity) -> str:
+def create_basic_user(db_entity: orm.Database().Entity) -> str:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
@@ -131,23 +119,24 @@ def create_basic_user(db: orm.Database().Entity) -> str:
         if username is None:
             continue
 
-        user = db.User.get(username=username)
+        user = db_entity.User.get(username=username)
 
         if user is not None:
             click.echo('The username entered already exists. Please choose a different username.')
             exit(1)
 
-        user_password: str = click.prompt(text=f'Enter password for {username}', type=str, default=username,
+        user_password: str = click.prompt(text=f'Enter password for {username}',
+                                          type=str, default=username,
                                           show_default=True, hide_input=True)
 
         # Generate password hash and salt
         hashed_password = generate_password_hash(user_password)
 
         try:
-            user = db.User(username=username,
-                           hash=hashed_password,
-                           created_dt_tm=datetime.now(),
-                           updated_dt_tm=datetime.now())
+            user = db_entity.User(username=username,
+                                  hash=hashed_password,
+                                  created_dt_tm=datetime.now(),
+                                  updated_dt_tm=datetime.now())
             orm.commit()
             click.echo(f'The user "{username}" has been created.')
         except Exception as e:
@@ -158,7 +147,7 @@ def create_basic_user(db: orm.Database().Entity) -> str:
 
 
 @orm.db_session
-def create_sample_data(db: orm.Database().Entity, username: str) -> None:
+def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
     """
     Creates a basic user (meets required fields) for the purposes of testing.
 
@@ -173,46 +162,46 @@ def create_sample_data(db: orm.Database().Entity, username: str) -> None:
     account_csv_path: str = os.path.join(sample_data_dir, 'account.csv')
     transaction_csv_path: str = os.path.join(sample_data_dir, 'transaction.csv')
 
-    user = db.User.get(username=username)
+    user = db_entity.User.get(username=username)
 
     # Insert BUDGET records
     with open(budget_csv_path, mode='r') as csv_file:
         budget_csv = csv.DictReader(csv_file)
 
         for budget in budget_csv:
-            db.Budget(name=budget['name'],
-                      description=budget['description'],
-                      budget_year=int(budget['budget_year']),
-                      created_dt_tm=datetime.now(),
-                      updated_dt_tm=datetime.now(),
-                      user_id=user.id)
+            db_entity.Budget(name=budget['name'],
+                             description=budget['description'],
+                             budget_year=int(budget['budget_year']),
+                             created_dt_tm=datetime.now(),
+                             updated_dt_tm=datetime.now(),
+                             user_id=user.id)
 
     # Insert BUDGET_ITEM records
     with open(budget_item_csv_path, mode='r') as csv_file:
         budget_item_csv = csv.DictReader(csv_file)
 
         for budget_item in budget_item_csv:
-            db.BudgetItem(name=budget_item['name'],
-                          description=budget_item['description'],
-                          budget_amount=float(budget_item['budget_amount']),
-                          sequence_order=int(budget_item['sequence_order']),
-                          created_dt_tm=datetime.now(),
-                          updated_dt_tm=datetime.now(),
-                          user_id=user.id)
+            db_entity.BudgetItem(name=budget_item['name'],
+                                 description=budget_item['description'],
+                                 budget_amount=float(budget_item['budget_amount']),
+                                 sequence_order=int(budget_item['sequence_order']),
+                                 created_dt_tm=datetime.now(),
+                                 updated_dt_tm=datetime.now(),
+                                 user_id=user.id)
 
     # Insert ACCOUNT records
     with open(account_csv_path, mode='r') as csv_file:
         account_csv = csv.DictReader(csv_file)
 
         for account in account_csv:
-            db.Account(name=account['name'],
-                       description=account['description'],
-                       account_number=account['account_number'],
-                       account_route_nbr=account['account_route_nbr'],
-                       opening_amount=float(account['opening_amount']),
-                       created_dt_tm=datetime.now(),
-                       updated_dt_tm=datetime.now(),
-                       user_id=user.id)
+            db_entity.Account(name=account['name'],
+                              description=account['description'],
+                              account_number=account['account_number'],
+                              account_route_nbr=account['account_route_nbr'],
+                              opening_amount=float(account['opening_amount']),
+                              created_dt_tm=datetime.now(),
+                              updated_dt_tm=datetime.now(),
+                              user_id=user.id)
 
     # Retrieve ACCOUNT and BUDGET_ITEM records as a lookup dictionaries
     # TODO: Find a better way to address looking up foreign key value
@@ -220,11 +209,11 @@ def create_sample_data(db: orm.Database().Entity, username: str) -> None:
     accounts_lookup: dict = {}
     budget_items_lookup: dict = {}
 
-    accounts = orm.select(a for a in db.Account if a.user_id == user)
+    accounts = orm.select(a for a in db_entity.Account if a.user_id == user)
     for account in accounts:
         accounts_lookup[account.name] = account.id
 
-    budget_items = orm.select(bi for bi in db.BudgetItem if bi.user_id == user)
+    budget_items = orm.select(bi for bi in db_entity.BudgetItem if bi.user_id == user)
     for budget_item in budget_items:
         budget_items_lookup[budget_item.name] = budget_item.id
 
@@ -233,15 +222,15 @@ def create_sample_data(db: orm.Database().Entity, username: str) -> None:
         transaction_csv = csv.DictReader(csv_file)
 
         for transaction in transaction_csv:
-            db.Transaction(description=transaction['description'],
-                           amount=float(transaction['amount']),
-                           transaction_dt_tm=datetime.fromisoformat(transaction['transaction_dt_tm']),
-                           note=transaction['note'],
-                           account_id=accounts_lookup[transaction['account_name']],
-                           budget_item_id=budget_items_lookup[transaction['budget_item_name']],
-                           created_dt_tm=datetime.now(),
-                           updated_dt_tm=datetime.now(),
-                           user_id=user.id)
+            db_entity.Transaction(description=transaction['description'],
+                                  amount=float(transaction['amount']),
+                                  transaction_dt_tm=datetime.fromisoformat(transaction['transaction_dt_tm']),
+                                  note=transaction['note'],
+                                  account_id=accounts_lookup[transaction['account_name']],
+                                  budget_item_id=budget_items_lookup[transaction['budget_item_name']],
+                                  created_dt_tm=datetime.now(),
+                                  updated_dt_tm=datetime.now(),
+                                  user_id=user.id)
 
     click.echo('Sample data has been successfully inserted.')
 
@@ -269,21 +258,21 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
     if version:
         click.echo(f'bootstrap-budget v{__version__}')
     else:
-        db = get_db()
+        current_database = get_db()
 
-        if db is not None:
+        if current_database is not None:
             if reset_bootstrap:
                 if click.confirm('Resetting Bootstrap Budget means deleting all of your data and starting over. '
                                  'Are you sure you want to do this?'):
-                    db.drop_all_tables(with_all_data=True)
-                    db.create_tables()
+                    current_database.drop_all_tables(with_all_data=True)
+                    current_database.create_tables()
                     click.echo('The Bootstrap Budget schema has been recreated.')
-                    create_admin_account(db)
+                    create_admin_account(current_database)
                     create_config_file()
                     click.echo('Your Boostrap Budget install has been completely reset!')
             elif reset_admin:
                 if click.confirm('You are about to reset your admin account. Are you sure you want to do this?'):
-                    reset_admin_password(db)
+                    reset_admin_password(current_database)
             elif backup:
                 # TODO: Complete the backup feature
                 # TODO: Include bootstrap_config.py file. This file should include the version of bootstrap-budget.
@@ -296,11 +285,11 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
                 click.echo('Your Boostrap Budget setup is already complete!')
         else:
             if setup:
-                db = define_db_entities()
-                db.bind(provider=PROVIDER_SQLITE, filename=SQLITE_DATABASE_FILE_PATH, create_db=True)
-                db.generate_mapping(create_tables=True)
+                # Setup db from entities
+                database.bind(provider=SQLITE_PROVIDER, filename=SQLITE_DATABASE_FILE_PATH, create_db=True)
+                database.generate_mapping(create_tables=True)
                 click.echo('The Bootstrap Budget schema has been created.')
-                create_admin_account(db)
+                create_admin_account(database)
                 create_config_file()
                 click.echo('Your Boostrap Budget setup is complete!')
             else:
@@ -318,14 +307,14 @@ def bootstrap_test(create_user: bool, create_sample: bool) -> None:
     :param create_sample: Inserts sample data set with test user.
     :return: None
     """
-    db = get_db()
+    current_database = get_db()
 
-    if db is not None:
+    if current_database is not None:
         if create_user:
-            create_basic_user(db)
+            create_basic_user(current_database)
         elif create_sample:
-            username = create_basic_user(db)
-            create_sample_data(db, username)
+            username = create_basic_user(current_database)
+            create_sample_data(current_database, username)
     else:
         click.echo('The Bootstrap Budget database has not been created. Run --setup first.')
 

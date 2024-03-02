@@ -7,7 +7,8 @@ from typing import Any
 from werkzeug.security import check_password_hash
 
 # Import bootstrap-budget blueprints/modules/classes/functions
-from . import User
+from . import __admin__
+from .entities import User
 
 
 # Define as a Flask blueprint: Auth
@@ -28,7 +29,7 @@ def login_required(view) -> Any:
 def admin_only(view) -> Any:
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['username'] == 'admin':
+        if session['username'] == __admin__:
             return view(**kwargs)
         else:
             return redirect(url_for('dashboard.index'))
@@ -40,7 +41,7 @@ def admin_only(view) -> Any:
 def user_only(view) -> Any:
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['username'] != 'admin':
+        if session['username'] != __admin__:
             return view(**kwargs)
         else:
             return redirect(url_for('admin.index'))
@@ -87,7 +88,7 @@ def login() -> Response | str:
             session['user_id'] = user.id
             session['username'] = form_username
 
-            if form_username == 'admin':
+            if form_username == __admin__:
                 return redirect(url_for('admin.index'))
             else:
                 return redirect(url_for('dashboard.index'))
