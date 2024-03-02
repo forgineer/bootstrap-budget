@@ -10,11 +10,12 @@ from .entities import (
 )
 
 
-# Set Bootstrap Budget version
-__version__: str = importlib.metadata.version('bootstrap_budget')
+# Set Bootstrap Budget globals
 __admin__: str = 'admin'
+__version__: str = importlib.metadata.version('bootstrap_budget')
 
 
+# TODO: Find a more elegant way to configure logging.
 dictConfig({
     'version': 1,
     'formatters': {
@@ -44,25 +45,20 @@ def create_app() -> Flask:
     """
     # Create and configure the app
     # The instance folder is set to 'relative' in order to find the config file easily
-    app = Flask(__name__, instance_relative_config=True)
-
-    # TODO: Remove this once the database bind is tested
-    # Check to see if the database was set up through the CLI utility.
-    #with app.app_context():
-    #    db_connection: sqlite3.Connection = data.get_db()
-    #
-    #    if db_connection is None:
-    #        raise RuntimeError('The Bootstrap Budget database has not been created. '
-    #                           'Use the "bootstrap --setup" CLI command to complete the installation.')
+    app: Flask = Flask(__name__, instance_relative_config=True)
 
     # Find the configuration file one level up from the instance folder (defined as relative)
     # A configuration file should have been created from the 'boostrap --setup' CLI and contain
     # the SECRET_KEY and any other configurations.
-    app.config.from_pyfile('bootstrap_config.py')
+    try:
+        app.config.from_pyfile('bootstrap_config.py')
 
-    # Bind the database from config
-    db.bind(**app.config['PONY'])
-    db.generate_mapping()
+        # Bind the database from config
+        db.bind(**app.config['PONY'])
+        db.generate_mapping()
+    except FileNotFoundError:
+        raise RuntimeError('Bootstrap Budget has not been properly installed. ' 
+                           'Use the "bootstrap --setup" CLI command to complete the installation.')
 
     # Wrap application requests with Pony's db_session
     Pony(app)

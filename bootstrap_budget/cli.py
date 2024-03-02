@@ -14,13 +14,13 @@ from .entities import (
 )
 
 # Define standard provider and filename for SQLite database integration
-SQLITE_PROVIDER = 'sqlite'
-SQLITE_DATABASE = 'bootstrap_budget.db'
+SQLITE_PROVIDER: str = 'sqlite'
+SQLITE_DATABASE: str = 'bootstrap_budget.db'
 
 # Pony does not assume the current working directory when defining the database filepath.
 # To place the database outside of site_packages we must define our working directory.
-CURRENT_WORKING_DIRECTORY = os.getcwd()
-SQLITE_DATABASE_FILE_PATH = os.path.join(CURRENT_WORKING_DIRECTORY, SQLITE_DATABASE).replace('\\', '\\\\')
+CURRENT_WORKING_DIRECTORY: str = os.getcwd()
+SQLITE_DATABASE_FILE_PATH: str = os.path.join(CURRENT_WORKING_DIRECTORY, SQLITE_DATABASE).replace('\\', '\\\\')
 
 
 def get_db() -> orm.Database().Entity | None:
@@ -45,17 +45,18 @@ def create_admin_account(db_entity: orm.Database().Entity) -> None:
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password', type=str, default=__admin__,
-                                show_default=True, hide_input=True)
+    admin_passwd: str = click.prompt(text='Enter admin password',
+                                     type=str, default=__admin__,
+                                     show_default=True, hide_input=True)
 
     # Generate password hash and salt
-    hashed_password = generate_password_hash(admin_passwd)
+    hashed_password: str = generate_password_hash(admin_passwd)
 
     try:
-        admin = db_entity.User(username=__admin__,
-                               hash=hashed_password,
-                               created_dt_tm=datetime.now(),
-                               updated_dt_tm=datetime.now())
+        admin: User = db_entity.User(username=__admin__,
+                                     hash=hashed_password,
+                                     created_dt_tm=datetime.now(),
+                                     updated_dt_tm=datetime.now())
         orm.commit()
         click.echo('The Bootstrap Budget admin account has been created.')
     except Exception as e:
@@ -69,7 +70,7 @@ def create_config_file() -> None:
 
     :return: None
     """
-    secret_key = secrets.token_urlsafe(32)
+    secret_key: str = secrets.token_urlsafe(32)
 
     # Create the Flask instance directory
     os.makedirs('instance', exist_ok=True)
@@ -88,15 +89,15 @@ def reset_admin_password(db_entity: orm.Database().Entity) -> None:
 
     :return: None
     """
-    admin_passwd = click.prompt(text='Enter admin password',
-                                type=str, default=__admin__,
-                                show_default=True, hide_input=True)
+    admin_passwd: str = click.prompt(text='Enter admin password',
+                                     type=str, default=__admin__,
+                                     show_default=True, hide_input=True)
 
     # Generate password hash and salt
-    hashed_password = generate_password_hash(admin_passwd)
+    hashed_password: str = generate_password_hash(admin_passwd)
 
     try:
-        admin = db_entity.User.get(username=__admin__)
+        admin: User = db_entity.User.get(username=__admin__)
         admin.hash = hashed_password
         click.echo('The Bootstrap Budget admin password has been reset.')
     except Exception as e:
@@ -119,7 +120,7 @@ def create_basic_user(db_entity: orm.Database().Entity) -> str:
         if username is None:
             continue
 
-        user = db_entity.User.get(username=username)
+        user: User = db_entity.User.get(username=username)
 
         if user is not None:
             click.echo('The username entered already exists. Please choose a different username.')
@@ -130,13 +131,13 @@ def create_basic_user(db_entity: orm.Database().Entity) -> str:
                                           show_default=True, hide_input=True)
 
         # Generate password hash and salt
-        hashed_password = generate_password_hash(user_password)
+        hashed_password: str = generate_password_hash(user_password)
 
         try:
-            user = db_entity.User(username=username,
-                                  hash=hashed_password,
-                                  created_dt_tm=datetime.now(),
-                                  updated_dt_tm=datetime.now())
+            user: User = db_entity.User(username=username,
+                                        hash=hashed_password,
+                                        created_dt_tm=datetime.now(),
+                                        updated_dt_tm=datetime.now())
             orm.commit()
             click.echo(f'The user "{username}" has been created.')
         except Exception as e:
@@ -154,19 +155,19 @@ def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
     :return: The user_id of the newly inserted user.
     """
     # Gather sample data
-    sample_data_path = sample_data.__file__
-    sample_data_dir = os.path.dirname(sample_data_path)
+    sample_data_path: str = sample_data.__file__
+    sample_data_dir: str = os.path.dirname(sample_data_path)
 
     budget_csv_path: str = os.path.join(sample_data_dir, 'budget.csv')
     budget_item_csv_path: str = os.path.join(sample_data_dir, 'budget_item.csv')
     account_csv_path: str = os.path.join(sample_data_dir, 'account.csv')
     transaction_csv_path: str = os.path.join(sample_data_dir, 'transaction.csv')
 
-    user = db_entity.User.get(username=username)
+    user: User = db_entity.User.get(username=username)
 
     # Insert BUDGET records
     with open(budget_csv_path, mode='r') as csv_file:
-        budget_csv = csv.DictReader(csv_file)
+        budget_csv: csv.DictReader = csv.DictReader(csv_file)
 
         for budget in budget_csv:
             db_entity.Budget(name=budget['name'],
@@ -178,7 +179,7 @@ def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
 
     # Insert BUDGET_ITEM records
     with open(budget_item_csv_path, mode='r') as csv_file:
-        budget_item_csv = csv.DictReader(csv_file)
+        budget_item_csv: csv.DictReader = csv.DictReader(csv_file)
 
         for budget_item in budget_item_csv:
             db_entity.BudgetItem(name=budget_item['name'],
@@ -191,7 +192,7 @@ def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
 
     # Insert ACCOUNT records
     with open(account_csv_path, mode='r') as csv_file:
-        account_csv = csv.DictReader(csv_file)
+        account_csv: csv.DictReader = csv.DictReader(csv_file)
 
         for account in account_csv:
             db_entity.Account(name=account['name'],
@@ -219,7 +220,7 @@ def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
 
     # Insert TRANSACTION records
     with open(transaction_csv_path, mode='r') as csv_file:
-        transaction_csv = csv.DictReader(csv_file)
+        transaction_csv: csv.DictReader = csv.DictReader(csv_file)
 
         for transaction in transaction_csv:
             db_entity.Transaction(description=transaction['description'],
@@ -258,7 +259,7 @@ def bootstrap(version: bool, setup: bool, reset_admin: bool, reset_bootstrap: bo
     if version:
         click.echo(f'bootstrap-budget v{__version__}')
     else:
-        current_database = get_db()
+        current_database: orm.Database().Entity = get_db()
 
         if current_database is not None:
             if reset_bootstrap:
@@ -307,7 +308,7 @@ def bootstrap_test(create_user: bool, create_sample: bool) -> None:
     :param create_sample: Inserts sample data set with test user.
     :return: None
     """
-    current_database = get_db()
+    current_database: orm.Database().Entity = get_db()
 
     if current_database is not None:
         if create_user:

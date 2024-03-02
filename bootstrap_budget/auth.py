@@ -16,6 +16,12 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 def login_required(view) -> Any:
+    """
+    Decorator for initiating a required login to a view or resource
+
+    :param view: The current view.
+    :return: Any (view).
+    """
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
@@ -27,6 +33,12 @@ def login_required(view) -> Any:
 
 
 def admin_only(view) -> Any:
+    """
+    Decorator ensuring admin usage to the view or resource only
+
+    :param view: The current view.
+    :return: Any (view).
+    """
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session['username'] == __admin__:
@@ -39,6 +51,12 @@ def admin_only(view) -> Any:
 
 
 def user_only(view) -> Any:
+    """
+    Decorator ensuring non-admin usage to the view or resource only
+
+    :param view: The current view.
+    :return: Any (view).
+    """
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if session['username'] != __admin__:
@@ -55,7 +73,7 @@ def load_logged_in_user() -> None:
     """
     If a user id is stored in the session, load the user object from the database into `g.user`.
 
-    :return: None
+    :return: None.
     """
     user_id = session.get("user_id")
 
@@ -67,6 +85,11 @@ def load_logged_in_user() -> None:
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response | str:
+    """
+    Perform user/admin login with password hash authentication
+
+    :return: Rendered view/template.
+    """
     # Clear the session from the very top in the event someone is manually returning to the login from another page.
     session.clear()
 
@@ -98,5 +121,10 @@ def login() -> Response | str:
 
 @bp.route('/logout')
 def logout() -> Response:
+    """
+    Log the current user/admin out by clearing the session and routing back to the login page.
+
+    :return: Redirect back to login page.
+    """
     session.clear()
     return redirect(url_for('dashboard.index'))
