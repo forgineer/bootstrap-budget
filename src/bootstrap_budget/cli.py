@@ -13,6 +13,9 @@ from .entities import (
     db as database, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
 )
 
+# Define Bootstrap Budget configuration file
+CONFIG_FILE = 'config.py'
+
 # Define standard provider and filename for SQLite database integration
 SQLITE_PROVIDER: str = 'sqlite'
 SQLITE_DATABASE: str = 'bootstrap_budget.db'
@@ -72,10 +75,7 @@ def create_config_file() -> None:
     """
     secret_key: str = secrets.token_urlsafe(32)
 
-    # Create the Flask instance directory
-    os.makedirs('instance', exist_ok=True)
-
-    with open('instance/bootstrap_config.py', 'w', ) as f:
+    with open(CONFIG_FILE, 'w', ) as f:
         f.write(f"SECRET_KEY = '{secret_key}'\n")
         f.write(f"PONY = {{'provider': '{SQLITE_PROVIDER}', 'filename': '{SQLITE_DATABASE_FILE_PATH}'}}\n")
 

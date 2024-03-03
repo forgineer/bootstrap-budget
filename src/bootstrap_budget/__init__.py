@@ -1,4 +1,5 @@
 import importlib.metadata
+import os
 
 from flask import Flask
 from logging.config import dictConfig
@@ -44,14 +45,14 @@ def create_app() -> Flask:
     :return: A Flask app (Bootstrap Budget)
     """
     # Create and configure the app
-    # The instance folder is set to 'relative' in order to find the config file easily
-    app: Flask = Flask(__name__, instance_relative_config=True)
+    app: Flask = Flask(__name__)
 
-    # Find the configuration file one level up from the instance folder (defined as relative)
-    # A configuration file should have been created from the 'boostrap --setup' CLI and contain
-    # the SECRET_KEY and any other configurations.
+    # A configuration file should have been created from the 'boostrap --setup' CLI at the venv root.
+    # This SECRET_KEY and any other configurations necessary for operation.
+    CONFIG_FILE_PATH: str = os.path.join(os.getcwd(), 'config.py')
+
     try:
-        app.config.from_pyfile('bootstrap_config.py')
+        app.config.from_pyfile(CONFIG_FILE_PATH)
 
         # Bind the database from config
         db.bind(**app.config['PONY'])
