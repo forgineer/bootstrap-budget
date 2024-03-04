@@ -15,4 +15,4 @@ bp = Blueprint('account', __name__, url_prefix='/accounts')
 @login_required
 @user_only
 def index() -> Response | str:
-    return render_template('account.html')
+    return render_template('account.html', user=g.user)

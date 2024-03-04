@@ -16,4 +16,4 @@ bp = Blueprint('transaction', __name__, url_prefix='/transactions')
 @login_required
 @user_only
 def index() -> Response | str:
-    return render_template('transaction.html')
+    return render_template('transaction.html', user=g.user)

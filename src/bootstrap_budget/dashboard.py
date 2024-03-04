@@ -17,4 +17,4 @@ bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 @login_required
 @user_only
 def index() -> Response | str:
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', user=g.user)

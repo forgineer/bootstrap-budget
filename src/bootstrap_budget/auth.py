@@ -114,7 +114,7 @@ def login() -> Response | str:
             if form_username == __admin__:
                 return redirect(url_for('admin.index'))
             else:
-                return redirect(url_for('dashboard.index'))
+                return redirect(url_for('dashboard.index', user=g.user))
 
     return render_template('login.html', error=error)
 

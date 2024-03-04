@@ -14,7 +14,7 @@ from .entities import (
 )
 
 # Define Bootstrap Budget configuration file
-CONFIG_FILE = 'config.py'
+CONFIG_FILE: str = 'config.py'
 
 # Define standard provider and filename for SQLite database integration
 SQLITE_PROVIDER: str = 'sqlite'

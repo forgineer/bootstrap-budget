@@ -32,14 +32,14 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 @admin_only
 def index() -> Response | str:
-    return render_template('admin.html')
+    return render_template('admin.html', user=g.user)
 
 
 @bp.route("/users")
 @login_required
 @admin_only
 def users() -> Response | str:
-    return render_template('user_admin.html')
+    return render_template('user_admin.html', user=g.user)
 
 
 @bp.route("/shutdown", methods=['POST'])
