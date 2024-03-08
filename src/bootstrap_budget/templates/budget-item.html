@@ -30,3 +30,14 @@
     </li>
 </ul>
 {% endblock %}
+
+{% block main_content %}
+    {% for budget_item in budget_items %}
+    <div class="container my-5">
+        <div class="p-5 bg-body-tertiary border rounded-3">
+            <h1 class="text-body-emphasis">{{ budget_item.name }}</h1>
+            <p>{{ budget_item.description }}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}
