@@ -45,12 +45,12 @@
                     <div class="modal-body">
                         <form>
                             {% macro user_profile_input(id, label, value='', type='text') -%}
-                                <div class="mb-2">
-                                    {% if type != 'hidden' %}
-                                    <label for="{{ id }}" class="col-form-label">{{ label }}</label>
-                                    {% endif %}
-                                    <input type="{{ type }}" class="form-control" id="{{ id }}" value="{{ value }}">
-                                </div>
+                            <div class="mb-2">
+                                {% if type != 'hidden' %}
+                                <label for="{{ id }}" class="col-form-label">{{ label }}</label>
+                                {% endif %}
+                                <input type="{{ type }}" class="form-control" id="{{ id }}" value="{{ value }}">
+                            </div>
                             {%- endmacro %}
 
                             {{ user_profile_input(id='user-username', label='Username:', value=user.username, type='hidden') }}

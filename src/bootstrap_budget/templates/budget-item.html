@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
+
 {% block view_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 {% endblock %}
+
 
 {% block nav_items %}
 <ul class="navbar-nav">
@@ -56,23 +58,20 @@
 </ul>
 {% endblock %}
 
+
 {% block main_content %}
 <div class="container my-5">
     <button type="button" class="btn btn-primary">+ Add New Budget Item</button>
 </div>
 
+{% for budget_item in budget_items %}
 <div class="container my-5">
-    {{ url_for(request.endpoint) }}
+    <a href="#">
+        <div class="p-3 bg-body-tertiary border rounded-3">
+            <h1 class="text-body-emphasis">{{ budget_item.name }}</h1>
+            <p>{{ budget_item.description }}</p>
+        </div>
+    </a>
 </div>
-
-    {% for budget_item in budget_items %}
-    <div class="container my-5">
-        <a href="#">
-            <div class="p-3 bg-body-tertiary border rounded-3">
-                <h1 class="text-body-emphasis">{{ budget_item.name }}</h1>
-                <p>{{ budget_item.description }}</p>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
+{% endfor %}
 {% endblock %}
