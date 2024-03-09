@@ -116,7 +116,7 @@ def login() -> Response | str:
             else:
                 return redirect(url_for('dashboard.index', user=g.user))
 
-    return render_template('login.html', error=error)
+    return render_template('login.html', error=error, user=None)
 
 
 @bp.route('/logout')
