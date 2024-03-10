@@ -115,7 +115,7 @@
                 </div>
             </div>
         </nav>
-        {% if user is not none %}
+        {% macro add_edit_profile_modal() -%}
         <div class="modal fade" id="editProfileModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -124,37 +124,38 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="user_update" action="{{ url_for('user.update') }}" method="post">
                             {% macro user_profile_input(id, label, value='', type='text') -%}
                             <div class="mb-2">
                                 {% if type != 'hidden' %}
-                                <label for="{{ id }}" class="col-form-label">{{ label }}</label>
+                                <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
                                 {% endif %}
-                                <input type="{{ type }}" class="form-control" id="{{ id }}" value="{% if value is not none %} {{ value }} {% endif %}">
+                                <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" value="{% if value is not none -%} {{ value }} {%- endif %}">
                             </div>
                             {%- endmacro %}
 
-                            {{ user_profile_input(id='user-username', label='Username:', value=user.username, type='hidden') }}
-                            {{ user_profile_input(id='user-first_name', label='First Name:', value=user.first_name) }}
-                            {{ user_profile_input(id='user-middle_name', label='Middle Name:', value=user.middle_name) }}
-                            {{ user_profile_input(id='user-last_name', label='Last Name:', value=user.last_name) }}
-                            {{ user_profile_input(id='user-address_line_1', label='Address line 1:', value=user.address_line_1) }}
-                            {{ user_profile_input(id='user-address_line_2', label='Address line 2:', value=user.address_line_2) }}
-                            {{ user_profile_input(id='user-city', label='City:', value=user.city) }}
-                            {{ user_profile_input(id='user-state', label='State:', value=user.state) }}
-                            {{ user_profile_input(id='user-zipcode', label='Zipcode:', value=user.zipcode) }}
-                            {{ user_profile_input(id='user-email', label='Email:', value=user.email, type='email') }}
-                            {{ user_profile_input(id='user-phone_number', label='Phone Number:', value=user.phone_number) }}
+                            {{ user_profile_input(id='username', label='Username:', value=user.username, type='hidden') }}
+                            {{ user_profile_input(id='first_name', label='First Name:', value=user.first_name) }}
+                            {{ user_profile_input(id='middle_name', label='Middle Name:', value=user.middle_name) }}
+                            {{ user_profile_input(id='last_name', label='Last Name:', value=user.last_name) }}
+                            {{ user_profile_input(id='address_line_1', label='Address line 1:', value=user.address_line_1) }}
+                            {{ user_profile_input(id='address_line_2', label='Address line 2:', value=user.address_line_2) }}
+                            {{ user_profile_input(id='city', label='City:', value=user.city) }}
+                            {{ user_profile_input(id='state', label='State:', value=user.state) }}
+                            {{ user_profile_input(id='zipcode', label='Zipcode:', value=user.zipcode) }}
+                            {{ user_profile_input(id='email', label='Email:', value=user.email, type='email') }}
+                            {{ user_profile_input(id='phone_number', label='Phone Number:', value=user.phone_number) }}
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="submit" form="user_update" class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
         </div>
-        {% endif %}
+        {%- endmacro %}
+        {% block modals %}{% endblock %}
         <main>
             {% block main_content %}{% endblock %}
         </main>

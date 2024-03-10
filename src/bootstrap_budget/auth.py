@@ -105,6 +105,8 @@ def login() -> Response | str:
             error = 'Incorrect username'
         elif not check_password_hash(user.hash, form_password):
             error = 'Incorrect password'
+        elif not user.is_active:
+            error = f'{user.username} is inactive'
 
         if error is None:
             session.clear()

@@ -14,11 +14,6 @@ from .auth import login_required, admin_only
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-# TODO: Admin password reset (Jumbotron)
-# - Current admin password
-# - New password
-# - Confirm password
-
 # TODO: Enable user registration
 # - Adds a link for self registration on the login page
 # - Otherwise users can only be added through the admin console
