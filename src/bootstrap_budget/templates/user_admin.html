@@ -11,3 +11,8 @@
     {{ add_user_admin_nav(active=True) }}
     {{ add_user_nav(edit=False) }}
 {% endblock %}
+
+
+{% block modals %}
+    {{ add_reset_password_modal() }}
+{% endblock %}

@@ -1,7 +1,11 @@
-a {
-  text-decoration: none !important;
+main {
+  padding-top: 1%;
 }
 
-body {
-  padding-top: 5%;
+.flash-alerts {
+  padding-top: 2%;
+}
+
+a {
+  text-decoration: none !important;
 }

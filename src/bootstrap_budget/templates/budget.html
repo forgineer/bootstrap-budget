@@ -18,16 +18,17 @@
 
 {% block modals %}
     {{ add_edit_profile_modal() }}
+    {{ add_reset_password_modal() }}
 {% endblock %}
 
 
 {% block main_content %}
-<div class="container my-5">
+<div class="container my-4">
     <button type="button" class="btn btn-primary">+ Add New Budget</button>
 </div>
 
 {% for budget in budgets %}
-<div class="container my-5">
+<div class="container my-4">
     <a href="#">
         <div class="p-5 bg-body-tertiary border rounded-3">
             <h1 class="text-body-emphasis">{{ budget.name }} ({{ budget.budget_year }})</h1>
