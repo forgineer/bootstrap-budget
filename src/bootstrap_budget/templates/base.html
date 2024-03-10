@@ -30,12 +30,93 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                    {% block nav_items %}{% endblock %}
+                    <ul class="navbar-nav">
+                        {% macro add_admin_console_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/admin" title="Admin Console">
+                                <i class="bi bi-building-fill-gear"></i> Admin Console
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_user_admin_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/admin/users" title="User Administration">
+                                <i class="bi bi-people-fill"></i> Users
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_dashboard_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}"  href="/dashboard" title="Dashboard">
+                                <i class="bi bi-bar-chart-steps"></i> Dashboard
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_budgets_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/budgets" title="Budgets">
+                                <i class="bi bi-piggy-bank"></i> Budgets
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_budget_items_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/budget-items" title="Budget Items">
+                                <i class="bi bi-list-task"></i> Budget Items
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_accounts_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/accounts" title="Accounts">
+                                <i class="bi bi-bank"></i> Accounts
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_transactions_nav(active=False) -%}
+                        <li class="nav-item">
+                            <a class="nav-link {% if active %} active {% endif %}" href="/transactions" title="Transactions">
+                                <i class="bi bi-list-columns"></i> Transactions
+                            </a>
+                        </li>
+                        {%- endmacro %}
+                        {% macro add_user_nav(edit=True, reset=True, logout=True) -%}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-fill"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% if edit %}
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProfileModal" title="Edit Profile">
+                                        <i class="bi bi-person-fill-gear"></i> Edit Profile
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if reset %}
+                                <li>
+                                    <a class="dropdown-item" href="#" title="Reset Password">
+                                        <i class="bi bi-key-fill"></i> Reset Password
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if logout %}
+                                <li>
+                                    <a class="dropdown-item" href="/auth/logout" title="Logout">
+                                        <i class="bi bi-lock-fill"></i> Logout
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {%- endmacro %}
+                        {% block nav_items %}{% endblock %}
+                    </ul>
                 </div>
             </div>
         </nav>
         {% if user is not none %}
-        <div class="modal" id="editProfileModal" tabindex="-1">
+        <div class="modal fade" id="editProfileModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -49,7 +130,7 @@
                                 {% if type != 'hidden' %}
                                 <label for="{{ id }}" class="col-form-label">{{ label }}</label>
                                 {% endif %}
-                                <input type="{{ type }}" class="form-control" id="{{ id }}" value="{{ value }}">
+                                <input type="{{ type }}" class="form-control" id="{{ id }}" value="{% if value is not none %} {{ value }} {% endif %}">
                             </div>
                             {%- endmacro %}
 
