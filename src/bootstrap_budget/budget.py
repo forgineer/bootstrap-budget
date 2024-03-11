@@ -7,7 +7,6 @@ from .auth import login_required, user_only
 from .entities import Budget
 
 
-# Define as a Flask blueprint: User
 bp = Blueprint('budget', __name__, url_prefix='/budgets')
 
 

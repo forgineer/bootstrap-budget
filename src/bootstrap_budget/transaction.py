@@ -6,7 +6,6 @@ from flask import (
 from .auth import login_required, user_only
 
 
-# Define as a Flask blueprint: User
 bp = Blueprint('transaction', __name__, url_prefix='/transactions')
 
 

@@ -10,7 +10,6 @@ from werkzeug.security import check_password_hash
 from .auth import login_required, admin_only
 
 
-# Define as a Flask blueprint: Admin
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 

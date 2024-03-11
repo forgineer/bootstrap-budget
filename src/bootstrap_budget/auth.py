@@ -11,7 +11,6 @@ from . import __admin__
 from .entities import User
 
 
-# Define as a Flask blueprint: Auth
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 

@@ -7,7 +7,6 @@ from .auth import login_required, user_only
 from .entities import User
 
 
-# Define as a Flask blueprint: User
 bp = Blueprint('user', __name__, url_prefix='/user')
 
 
