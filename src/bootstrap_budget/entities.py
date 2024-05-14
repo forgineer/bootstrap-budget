@@ -30,7 +30,7 @@ class User(db.Entity):
     budgets = orm.Set('Budget')
     budget_items = orm.Set('BudgetItem')
     transactions = orm.Set('Transaction')
-    user_budgets = orm.Set('UserBudget')
+    budget_accounts = orm.Set('BudgetAccount')
 
 
 """
@@ -99,7 +99,7 @@ class Budget(db.Entity):
     updated_dt_tm = orm.Required(datetime)
     is_active = orm.Required(bool, default=True)
     user_id = orm.Required(User)
-    user_budgets = orm.Set('UserBudget')
+    budget_accounts = orm.Set('BudgetAccount')
     orm.composite_key(name, user_id)
 
 
@@ -120,32 +120,16 @@ CREATE INDEX "idx_budget__user_id" ON "BUDGET" ("user_id");
 """
 
 
-class UserBudget(db.Entity):
-    _table_ = 'USER_BUDGET'
+class BudgetAccount(db.Entity):
+    _table_ = 'BUDGET_ACCOUNT'
 
     id = orm.PrimaryKey(int, auto=True)
-    permissions = orm.Required(int)
     created_dt_tm = orm.Required(datetime)
     updated_dt_tm = orm.Required(datetime)
     is_active = orm.Required(bool, default=True)
     user_id = orm.Required(User)
+    account_id = orm.Required('Account')
     budget_id = orm.Required(Budget)
-
-
-"""
-CREATE TABLE "USER_BUDGET" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "permissions" INTEGER NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    "budget_id" INTEGER NOT NULL REFERENCES "BUDGET" ("id") ON DELETE CASCADE
-);
-
-CREATE INDEX "idx_user_budget__budget_id" ON "USER_BUDGET" ("budget_id");
-CREATE INDEX "idx_user_budget__user_id" ON "USER_BUDGET" ("user_id");
-"""
 
 
 class BudgetItem(db.Entity):
@@ -195,6 +179,7 @@ class Account(db.Entity):
     updated_dt_tm = orm.Required(datetime)
     is_active = orm.Required(bool, default=True)
     user_id = orm.Required(User)
+    budget_accounts = orm.Set(BudgetAccount)
     transactions = orm.Set('Transaction')
     orm.composite_key(name, user_id)
 

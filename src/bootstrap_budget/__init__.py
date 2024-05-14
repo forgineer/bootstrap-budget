@@ -7,7 +7,7 @@ from pony.flask import Pony
 
 # Define database and entities (Pony ORM)
 from .entities import (
-    db, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
+    db, User, Config, Budget, BudgetAccount, BudgetItem, Account, Transaction
 )
 
 

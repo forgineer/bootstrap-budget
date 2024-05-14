@@ -188,19 +188,18 @@
                     </div>
                     <div class="modal-body">
                         <form id="reset_password" action="{{ url_for('user.reset_password') }}" method="post">
-                            {% macro user_password_input(id, label, value='', type='text') -%}
+                            {% macro user_password_input(id, label, value='', type='text', required=False) -%}
                             <div class="mb-2">
                                 {% if type != 'hidden' %}
                                 <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
                                 {% endif %}
-                                <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" value="{% if value is not none -%} {{ value }} {%- endif %}">
+                                <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" value="{% if value is not none -%} {{ value }} {%- endif %}" {% if required -%} required {%- endif %}>
                             </div>
                             {%- endmacro %}
 
                             {{ user_password_input(id='username', label='Username:', value=user.username, type='hidden') }}
-                            {{ user_password_input(id='current_password', label='Current Password:', type='password') }}
-                            {{ user_password_input(id='new_password', label='New Password:', type='password') }}
-                            {{ user_password_input(id='confirm_password', label='Confirm New Password:', type='password') }}
+                            {{ user_password_input(id='new_password', label='New Password:', type='password', required=True) }}
+                            {{ user_password_input(id='confirm_password', label='Confirm New Password:', type='password', required=True) }}
                         </form>
                     </div>
                     <div class="modal-footer">

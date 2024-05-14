@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 
 # Define database and entities (Pony ORM)
 from .entities import (
-    db as database, User, Config, Budget, UserBudget, BudgetItem, Account, Transaction
+    db as database, User, Config, Budget, BudgetAccount, BudgetItem, Account, Transaction
 )
 
 # Define Bootstrap Budget configuration file

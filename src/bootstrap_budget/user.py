@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, current_app, flash, g, redirect, render_template, request, Response, session, url_for
 )
+from werkzeug.security import generate_password_hash
 
 # Bootstrap Budget Imports
 from .auth import login_required, user_only
@@ -25,25 +26,21 @@ def update() -> Response | str:
 
     :return: Back to current view after update.
     """
-    user: User = g.user
-
     try:
-        user.first_name = request.form['first_name']
-        user.middle_name = request.form['middle_name']
-        user.last_name = request.form['last_name']
-        user.address_line_1 = request.form['address_line_1']
-        user.address_line_2 = request.form['address_line_2']
-        user.city = request.form['city']
-        user.state = request.form['state']
-        user.zipcode = request.form['zipcode']
-        user.email = request.form['email']
-        user.phone_number = request.form['phone_number']
+        g.user.first_name = request.form['first_name']
+        g.user.middle_name = request.form['middle_name']
+        g.user.last_name = request.form['last_name']
+        g.user.address_line_1 = request.form['address_line_1']
+        g.user.address_line_2 = request.form['address_line_2']
+        g.user.city = request.form['city']
+        g.user.state = request.form['state']
+        g.user.zipcode = request.form['zipcode']
+        g.user.email = request.form['email']
+        g.user.phone_number = request.form['phone_number']
 
         flash('User profile was successfully saved.', 'info')
     except Exception as e:
         flash(f'User profile failed to save: {e}', 'error')
-
-    g.user = user
 
     return redirect(request.referrer)
 
@@ -56,6 +53,24 @@ def reset_password() -> Response | str:
 
     :return: Back to current view after update.
     """
-    flash('This does not do anything yet, Sorry :-/', 'warning')
+    try:
+        username: str = request.form['username']
+        user: User
+
+        if g.user.username != username:
+            user = User.get(username=request.form['username'])
+        else:
+            user = g.user
+
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password == confirm_password:
+            user.hash = generate_password_hash(new_password)
+            flash('User password was successfully changed.', 'info')
+        else:
+            flash('User password failed to change. Passwords did not match.', 'error')
+    except Exception as e:
+        flash(f'User password failed to be reset: {e}', 'error')
 
     return redirect(request.referrer)
