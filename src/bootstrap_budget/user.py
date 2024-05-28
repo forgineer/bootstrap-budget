@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, current_app, flash, g, redirect, render_template, request, Response, session, url_for
+    current_app, Blueprint, flash, g, redirect, render_template, request, Response
 )
 from werkzeug.security import generate_password_hash
 

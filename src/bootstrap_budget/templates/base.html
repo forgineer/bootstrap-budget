@@ -1,3 +1,11 @@
+{% macro form_input(id, label, value='', type='text', required=False, number_step='1', placeholder='') -%}
+<div class="mb-2">
+    {% if type != 'hidden' %}
+    <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
+    {% endif %}
+    <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" {% if type == 'number' -%}step="{{ number_step }}"{%- endif %} placeholder="{% if placeholder is not none -%} {{ placeholder }} {%- endif %}" value="{% if value is not none -%} {{ value }} {%- endif %}"{% if required -%} required{%- endif %}>
+</div>
+{%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -149,25 +157,16 @@
                     </div>
                     <div class="modal-body">
                         <form id="user_update" action="{{ url_for('user.update') }}" method="post">
-                            {% macro user_profile_input(id, label, value='', type='text') -%}
-                            <div class="mb-2">
-                                {% if type != 'hidden' %}
-                                <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
-                                {% endif %}
-                                <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" value="{% if value is not none -%} {{ value }} {%- endif %}">
-                            </div>
-                            {%- endmacro %}
-
-                            {{ user_profile_input(id='first_name', label='First Name:', value=user.first_name) }}
-                            {{ user_profile_input(id='middle_name', label='Middle Name:', value=user.middle_name) }}
-                            {{ user_profile_input(id='last_name', label='Last Name:', value=user.last_name) }}
-                            {{ user_profile_input(id='address_line_1', label='Address line 1:', value=user.address_line_1) }}
-                            {{ user_profile_input(id='address_line_2', label='Address line 2:', value=user.address_line_2) }}
-                            {{ user_profile_input(id='city', label='City:', value=user.city) }}
-                            {{ user_profile_input(id='state', label='State:', value=user.state) }}
-                            {{ user_profile_input(id='zipcode', label='Zipcode:', value=user.zipcode) }}
-                            {{ user_profile_input(id='email', label='Email:', value=user.email, type='email') }}
-                            {{ user_profile_input(id='phone_number', label='Phone Number:', value=user.phone_number) }}
+                            {{ form_input(id='first_name', label='First Name:', value=user.first_name) }}
+                            {{ form_input(id='middle_name', label='Middle Name:', value=user.middle_name) }}
+                            {{ form_input(id='last_name', label='Last Name:', value=user.last_name) }}
+                            {{ form_input(id='address_line_1', label='Address line 1:', value=user.address_line_1) }}
+                            {{ form_input(id='address_line_2', label='Address line 2:', value=user.address_line_2) }}
+                            {{ form_input(id='city', label='City:', value=user.city) }}
+                            {{ form_input(id='state', label='State:', value=user.state) }}
+                            {{ form_input(id='zipcode', label='Zipcode:', value=user.zipcode) }}
+                            {{ form_input(id='email', label='Email:', value=user.email, type='email') }}
+                            {{ form_input(id='phone_number', label='Phone Number:', value=user.phone_number) }}
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -188,18 +187,9 @@
                     </div>
                     <div class="modal-body">
                         <form id="reset_password" action="{{ url_for('user.reset_password') }}" method="post">
-                            {% macro user_password_input(id, label, value='', type='text', required=False) -%}
-                            <div class="mb-2">
-                                {% if type != 'hidden' %}
-                                <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
-                                {% endif %}
-                                <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" value="{% if value is not none -%} {{ value }} {%- endif %}" {% if required -%} required {%- endif %}>
-                            </div>
-                            {%- endmacro %}
-
-                            {{ user_password_input(id='username', label='Username:', value=user.username, type='hidden') }}
-                            {{ user_password_input(id='new_password', label='New Password:', type='password', required=True) }}
-                            {{ user_password_input(id='confirm_password', label='Confirm New Password:', type='password', required=True) }}
+                            {{ form_input(id='username', label='Username:', value=user.username, type='hidden') }}
+                            {{ form_input(id='new_password', label='New Password:', type='password', required=True) }}
+                            {{ form_input(id='confirm_password', label='Confirm New Password:', type='password', required=True) }}
                         </form>
                     </div>
                     <div class="modal-footer">

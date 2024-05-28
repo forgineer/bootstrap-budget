@@ -28,9 +28,9 @@ class User(db.Entity):
     accounts = orm.Set('Account')
     configs = orm.Set('Config')
     budgets = orm.Set('Budget')
+    budget_accounts = orm.Set('BudgetAccount')
     budget_items = orm.Set('BudgetItem')
     transactions = orm.Set('Transaction')
-    budget_accounts = orm.Set('BudgetAccount')
 
 
 """

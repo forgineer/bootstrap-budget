@@ -214,6 +214,16 @@ def create_sample_data(db_entity: orm.Database().Entity, username: str) -> None:
     for account in accounts:
         accounts_lookup[account.name] = account.id
 
+    # Insert BUDGET_ACCOUNT records
+    budgets = orm.select(b for b in db_entity.Budget if b.user_id == user)
+    for budget in budgets:
+        for account in accounts:
+            db_entity.BudgetAccount(created_dt_tm=datetime.now(),
+                                    updated_dt_tm=datetime.now(),
+                                    user_id=user.id,
+                                    account_id=account.id,
+                                    budget_id=budget.id)
+
     budget_items = orm.select(bi for bi in db_entity.BudgetItem if bi.user_id == user)
     for budget_item in budget_items:
         budget_items_lookup[budget_item.name] = budget_item.id
