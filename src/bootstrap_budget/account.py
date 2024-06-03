@@ -31,6 +31,7 @@ def create() -> Response | str:
     """
     try:
         current_app.logger.info(request.form)
+
         Account(name=request.form['name'],
                 description=request.form['description'],
                 account_number=request.form['account_number'],
@@ -57,6 +58,7 @@ def update() -> Response | str:
     """
     try:
         current_app.logger.info(request.form)
+
         account_id: int = int(request.form['id'])
         Account[account_id].set(name=request.form['name'],
                                 description=request.form['description'],
@@ -82,6 +84,7 @@ def delete() -> Response | str:
     """
     try:
         current_app.logger.info(request.form)
+
         account_id: int = int(request.form['id'])
         Account[account_id].delete()
 

@@ -49,13 +49,18 @@ def create() -> Response | str:
 @login_required
 def update() -> Response | str:
     """
-    Update the current budget from the 'Edit Budget' modal.
+    Update the current budget from the 'Update Budget' modal.
 
     :return: Back to current view after update.
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
+
+        budget_id: int = int(request.form['id'])
+        Budget[budget_id].set(name=request.form['name'],
+                              description=request.form['description'],
+                              budget_year=int(request.form['budget_year']),
+                              updated_dt_tm=datetime.now())
 
         flash('The budget was successfully saved.', 'info')
     except Exception as e:
@@ -68,13 +73,15 @@ def update() -> Response | str:
 @login_required
 def delete() -> Response | str:
     """
-    Update the current budget from the 'Edit Budget' modal.
+    Delete a budget.
 
-    :return: Back to current view after update.
+    :return: Back to current view after deletion.
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
+
+        budget_id: int = int(request.form['id'])
+        Budget[budget_id].delete()
 
         flash('The budget was successfully saved.', 'info')
     except Exception as e:
