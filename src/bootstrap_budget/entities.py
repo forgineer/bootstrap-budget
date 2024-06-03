@@ -35,22 +35,22 @@ class User(db.Entity):
 
 """
 CREATE TABLE "USER" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "last_name" TEXT,
-    "first_name" TEXT,
-    "middle_name" TEXT,
-    "username" TEXT UNIQUE NOT NULL,
-    "address_line_1" TEXT,
-    "address_line_2" TEXT,
-    "city" TEXT,
-    "state" TEXT,
-    "zipcode" TEXT,
-    "email" TEXT,
-    "phone_number" TEXT,
-    "hash" TEXT NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "last_name" TEXT,
+  "first_name" TEXT,
+  "middle_name" TEXT,
+  "username" TEXT UNIQUE NOT NULL,
+  "address_line_1" TEXT,
+  "address_line_2" TEXT,
+  "city" TEXT,
+  "state" TEXT,
+  "zipcode" TEXT,
+  "email" TEXT,
+  "phone_number" TEXT,
+  "hash" TEXT NOT NULL,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL
 );
 """
 
@@ -72,16 +72,16 @@ class Config(db.Entity):
 
 """
 CREATE TABLE "CONFIG" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT UNIQUE NOT NULL,
-    "description" TEXT,
-    "config_value" TEXT,
-    "config_value_type" INTEGER NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    CONSTRAINT "unq_config__name_user_id" UNIQUE ("name", "user_id")
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT UNIQUE NOT NULL,
+  "description" TEXT,
+  "config_value" TEXT,
+  "config_value_type" INTEGER NOT NULL,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  CONSTRAINT "unq_config__name_user_id" UNIQUE ("name", "user_id")
 );
 
 CREATE INDEX "idx_config__user_id" ON "CONFIG" ("user_id");
@@ -105,15 +105,15 @@ class Budget(db.Entity):
 
 """
 CREATE TABLE "BUDGET" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "budget_year" INTEGER NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    CONSTRAINT "unq_budget__name_user_id" UNIQUE ("name", "user_id")
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT NOT NULL,
+  "description" TEXT,
+  "budget_year" INTEGER NOT NULL,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  CONSTRAINT "unq_budget__name_user_id" UNIQUE ("name", "user_id")
 );
 
 CREATE INDEX "idx_budget__user_id" ON "BUDGET" ("user_id");
@@ -130,6 +130,23 @@ class BudgetAccount(db.Entity):
     user_id = orm.Required(User)
     account_id = orm.Required('Account')
     budget_id = orm.Required(Budget)
+
+
+"""
+CREATE TABLE "BUDGET_ACCOUNT" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  "account_id" INTEGER NOT NULL REFERENCES "ACCOUNT" ("id") ON DELETE CASCADE,
+  "budget_id" INTEGER NOT NULL REFERENCES "BUDGET" ("id") ON DELETE CASCADE
+);
+
+CREATE INDEX "idx_budget_account__account_id" ON "BUDGET_ACCOUNT" ("account_id");
+CREATE INDEX "idx_budget_account__budget_id" ON "BUDGET_ACCOUNT" ("budget_id");
+CREATE INDEX "idx_budget_account__user_id" ON "BUDGET_ACCOUNT" ("user_id");
+"""
 
 
 class BudgetItem(db.Entity):
@@ -150,16 +167,16 @@ class BudgetItem(db.Entity):
 
 """
 CREATE TABLE "BUDGET_ITEM" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "budget_amount" REAL NOT NULL,
-    "sequence_order" INTEGER NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    CONSTRAINT "unq_budget_item__name_user_id" UNIQUE ("name", "user_id")
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT NOT NULL,
+  "description" TEXT,
+  "budget_amount" REAL NOT NULL,
+  "sequence_order" INTEGER NOT NULL,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  CONSTRAINT "unq_budget_item__name_user_id" UNIQUE ("name", "user_id")
 );
 
 CREATE INDEX "idx_budget_item__user_id" ON "BUDGET_ITEM" ("user_id");
@@ -186,17 +203,17 @@ class Account(db.Entity):
 
 """
 CREATE TABLE "ACCOUNT" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL,
-    "description" TEXT,
-    "account_number" TEXT,
-    "account_route_nbr" TEXT,
-    "opening_amount" REAL NOT NULL,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME NOT NULL,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    CONSTRAINT "unq_account__name_user_id" UNIQUE ("name", "user_id")
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT NOT NULL,
+  "description" TEXT,
+  "account_number" TEXT,
+  "account_route_nbr" TEXT,
+  "opening_amount" REAL NOT NULL,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME NOT NULL,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  CONSTRAINT "unq_account__name_user_id" UNIQUE ("name", "user_id")
 );
 
 CREATE INDEX "idx_account__user_id" ON "ACCOUNT" ("user_id");
@@ -221,17 +238,17 @@ class Transaction(db.Entity):
 
 """
 CREATE TABLE "TRANSACTION" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "description" TEXT,
-    "amount" REAL NOT NULL,
-    "transaction_dt_tm" DATETIME NOT NULL,
-    "note" TEXT,
-    "created_dt_tm" DATETIME NOT NULL,
-    "updated_dt_tm" DATETIME,
-    "is_active" BOOLEAN NOT NULL,
-    "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
-    "account_id" INTEGER NOT NULL REFERENCES "ACCOUNT" ("id") ON DELETE CASCADE,
-    "budget_item_id" INTEGER NOT NULL REFERENCES "BUDGET_ITEM" ("id") ON DELETE CASCADE
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "description" TEXT,
+  "amount" REAL NOT NULL,
+  "transaction_dt_tm" DATETIME NOT NULL,
+  "note" TEXT,
+  "created_dt_tm" DATETIME NOT NULL,
+  "updated_dt_tm" DATETIME,
+  "is_active" BOOLEAN NOT NULL,
+  "user_id" INTEGER NOT NULL REFERENCES "USER" ("id") ON DELETE CASCADE,
+  "account_id" INTEGER NOT NULL REFERENCES "ACCOUNT" ("id") ON DELETE CASCADE,
+  "budget_item_id" INTEGER NOT NULL REFERENCES "BUDGET_ITEM" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "idx_transaction__account_id" ON "TRANSACTION" ("account_id");

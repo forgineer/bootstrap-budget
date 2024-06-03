@@ -49,7 +49,7 @@
 
 {% for budget in budgets %}
 <div class="container my-4">
-    <a href="#" data-bs-toggle="modal" data-bs-target="#editBudgetModal-{{ budget.id }}" title="{{ budget.name }}">
+    <a href="#" data-bs-toggle="modal" data-bs-target="#updateBudgetModal-{{ budget.id }}" title="{{ budget.name }}">
         <div class="p-5 bg-body-tertiary border rounded-3">
             <h1 class="text-body-emphasis">{{ budget.name }} ({{ budget.budget_year }})</h1>
             <p>{{ budget.description }}</p>
@@ -57,7 +57,7 @@
         </div>
     </a>
 </div>
-<div class="modal fade" id="editBudgetModal-{{ budget.id }}" tabindex="-1">
+<div class="modal fade" id="updateBudgetModal-{{ budget.id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

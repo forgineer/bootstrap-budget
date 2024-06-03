@@ -27,6 +27,7 @@ def update() -> Response | str:
     :return: Back to current view after update.
     """
     try:
+        current_app.logger.info(request.form)
         g.user.first_name = request.form['first_name']
         g.user.middle_name = request.form['middle_name']
         g.user.last_name = request.form['last_name']
@@ -54,6 +55,7 @@ def reset_password() -> Response | str:
     :return: Back to current view after update.
     """
     try:
+        current_app.logger.info(request.form)
         username: str = request.form['username']
         user: User
 

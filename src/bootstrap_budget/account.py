@@ -30,6 +30,7 @@ def create() -> Response | str:
     :return: Back to current view after creation.
     """
     try:
+        current_app.logger.info(request.form)
         Account(name=request.form['name'],
                 description=request.form['description'],
                 account_number=request.form['account_number'],
@@ -50,17 +51,23 @@ def create() -> Response | str:
 @login_required
 def update() -> Response | str:
     """
-    Update the current account from the 'Edit Account' modal.
+    Update the current account from the 'Update Account' modal.
 
     :return: Back to current view after update.
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
+        account_id: int = int(request.form['id'])
+        Account[account_id].set(name=request.form['name'],
+                                description=request.form['description'],
+                                account_number=request.form['account_number'],
+                                account_route_nbr=request.form['account_route_nbr'],
+                                opening_amount=float(request.form['opening_amount']),
+                                updated_dt_tm=datetime.now())
 
-        flash('The budget was successfully saved.', 'info')
+        flash('The account was successfully updated.', 'info')
     except Exception as e:
-        flash(f'The budget failed to save: {e}', 'error')
+        flash(f'The account failed to update: {e}', 'error')
 
     return redirect(request.referrer)
 
@@ -75,10 +82,11 @@ def delete() -> Response | str:
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
+        account_id: int = int(request.form['id'])
+        Account[account_id].delete()
 
-        flash('The budget was successfully saved.', 'info')
+        flash('The account was successfully deleted.', 'info')
     except Exception as e:
-        flash(f'The budget failed to save: {e}', 'error')
+        flash(f'The account failed to delete: {e}', 'error')
 
     return redirect(request.referrer)

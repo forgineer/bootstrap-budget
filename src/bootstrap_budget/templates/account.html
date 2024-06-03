@@ -51,12 +51,57 @@
 
 {% for account in accounts %}
 <div class="container my-4">
-    <a href="#">
+    <a href="#" data-bs-toggle="modal" data-bs-target="#updateAccountModal-{{ account.id }}" title="{{ account.name }}">
         <div class="p-5 bg-body-tertiary border rounded-3">
             <h1 class="text-body-emphasis">{{ account.name }}</h1>
             <p>{{ account.description }}</p>
         </div>
     </a>
+</div>
+<div class="modal fade" id="updateAccountModal-{{ account.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit {{ account.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="account_update-{{ account.id }}" action="{{ url_for('account.update') }}" method="post">
+                    {{ form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
+                    {{ form_input(id='name', label='Account Name:', value=account.name, required=True) }}
+                    {{ form_input(id='description', label='Account Description:', value=account.description) }}
+                    {{ form_input(id='account_number', label='Account Number:', value=account.account_number) }}
+                    {{ form_input(id='account_route_nbr', label='Account Routing Number:', value=account.account_route_nbr) }}
+                    {{ form_input(id='opening_amount', label='Opening Amount:', value=account.opening_amount, type='number', number_step='0.01', required=True) }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger pull-left" data-bs-toggle="modal" data-bs-target="#deleteAccountModal-{{ account.id }}">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="account_update-{{ account.id }}">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteAccountModal-{{ account.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-circle-fill"></i> Delete {{ account.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ account.name }}</strong>?</p>
+                <form id="account_delete-{{ account.id }}" action="{{ url_for('account.delete') }}" method="post">
+                    {{ form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="account_delete-{{ account.id }}">Yes</button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endfor %}
 {% endblock %}
