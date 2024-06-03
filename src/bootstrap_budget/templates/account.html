@@ -35,11 +35,11 @@
             </div>
             <div class="modal-body">
                 <form id="account_create" action="{{ url_for('account.create') }}" method="post">
-                    {{ form_input(id='name', label='Account Name:', required=True) }}
-                    {{ form_input(id='description', label='Account Description:') }}
-                    {{ form_input(id='account_number', label='Account Number:') }}
-                    {{ form_input(id='account_route_nbr', label='Account Routing Number:') }}
-                    {{ form_input(id='opening_amount', label='Opening Amount:', type='number', number_step='0.01') }}
+                    {{ add_form_input(id='name', label='Account Name:', required=True) }}
+                    {{ add_form_input(id='description', label='Account Description:') }}
+                    {{ add_form_input(id='account_number', label='Account Number:') }}
+                    {{ add_form_input(id='account_route_nbr', label='Account Routing Number:') }}
+                    {{ add_form_input(id='opening_amount', label='Opening Amount:', type='number', number_step='0.01') }}
                 </form>
             </div>
             <div class="modal-footer">
@@ -68,12 +68,12 @@
             </div>
             <div class="modal-body">
                 <form id="account_update-{{ account.id }}" action="{{ url_for('account.update') }}" method="post">
-                    {{ form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
-                    {{ form_input(id='name', label='Account Name:', value=account.name, required=True) }}
-                    {{ form_input(id='description', label='Account Description:', value=account.description) }}
-                    {{ form_input(id='account_number', label='Account Number:', value=account.account_number) }}
-                    {{ form_input(id='account_route_nbr', label='Account Routing Number:', value=account.account_route_nbr) }}
-                    {{ form_input(id='opening_amount', label='Opening Amount:', value=account.opening_amount, type='number', number_step='0.01', required=True) }}
+                    {{ add_form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
+                    {{ add_form_input(id='name', label='Account Name:', value=account.name, required=True) }}
+                    {{ add_form_input(id='description', label='Account Description:', value=account.description) }}
+                    {{ add_form_input(id='account_number', label='Account Number:', value=account.account_number) }}
+                    {{ add_form_input(id='account_route_nbr', label='Account Routing Number:', value=account.account_route_nbr) }}
+                    {{ add_form_input(id='opening_amount', label='Opening Amount:', value=account.opening_amount, type='number', number_step='0.01', required=True) }}
                 </form>
             </div>
             <div class="modal-footer">
@@ -94,7 +94,7 @@
             <div class="modal-body">
                 <p>Are you sure you want to delete <strong>{{ account.name }}</strong>?</p>
                 <form id="account_delete-{{ account.id }}" action="{{ url_for('account.delete') }}" method="post">
-                    {{ form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
+                    {{ add_form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
                 </form>
             </div>
             <div class="modal-footer">

@@ -49,17 +49,23 @@ def create() -> Response | str:
 @login_required
 def update() -> Response | str:
     """
-    Update the current account from the 'Edit Account' modal.
+    Update the current budget item from the 'Update Budget Item' modal.
 
     :return: Back to current view after update.
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
 
-        flash('The budget was successfully saved.', 'info')
+        budget_item_id: int = int(request.form['id'])
+        BudgetItem[budget_item_id].set(name=request.form['name'],
+                                       description=request.form['description'],
+                                       budget_amount=float(request.form['budget_amount']),
+                                       sequence_order=int(request.form['sequence_order']),
+                                       updated_dt_tm=datetime.now())
+
+        flash('The budget item was successfully updated.', 'info')
     except Exception as e:
-        flash(f'The budget failed to save: {e}', 'error')
+        flash(f'The budget item failed to update: {e}', 'error')
 
     return redirect(request.referrer)
 
@@ -68,16 +74,18 @@ def update() -> Response | str:
 @login_required
 def delete() -> Response | str:
     """
-    Delete an account.
+    Delete a budget item.
 
     :return: Back to current view after deletion.
     """
     try:
         current_app.logger.info(request.form)
-        #g.user.first_name = request.form['first_name']
 
-        flash('The budget was successfully saved.', 'info')
+        budget_item_id: int = int(request.form['id'])
+        BudgetItem[budget_item_id].delete()
+
+        flash('The budget item was successfully deleted.', 'info')
     except Exception as e:
-        flash(f'The budget failed to save: {e}', 'error')
+        flash(f'The budget item failed to delete: {e}', 'error')
 
     return redirect(request.referrer)

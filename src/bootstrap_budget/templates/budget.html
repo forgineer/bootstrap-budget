@@ -35,9 +35,9 @@
             </div>
             <div class="modal-body">
                 <form id="budget_create" action="{{ url_for('budget.create') }}" method="post">
-                    {{ form_input(id='name', label='Budget Name:', required=True) }}
-                    {{ form_input(id='description', label='Budget Description:') }}
-                    {{ form_input(id='budget_year', label='Budget Year:', type='number', required=True) }}
+                    {{ add_form_input(id='name', label='Budget Name:', required=True) }}
+                    {{ add_form_input(id='description', label='Budget Description:') }}
+                    {{ add_form_input(id='budget_year', label='Budget Year:', type='number', required=True) }}
                 </form>
             </div>
             <div class="modal-footer">
@@ -67,10 +67,10 @@
             </div>
             <div class="modal-body">
                 <form id="budget_update-{{ budget.id }}" action="{{ url_for('budget.update') }}" method="post">
-                    {{ form_input(id='id', label='Budget Id:', value=budget.id, type='hidden') }}
-                    {{ form_input(id='name', label='Budget Name:', value=budget.name, required=True) }}
-                    {{ form_input(id='description', label='Budget Description:', value=budget.description) }}
-                    {{ form_input(id='budget_year', label='Budget Year:', value=budget.budget_year, type='number', required=True) }}
+                    {{ add_form_input(id='id', label='Budget Id:', value=budget.id, type='hidden') }}
+                    {{ add_form_input(id='name', label='Budget Name:', value=budget.name, required=True) }}
+                    {{ add_form_input(id='description', label='Budget Description:', value=budget.description) }}
+                    {{ add_form_input(id='budget_year', label='Budget Year:', value=budget.budget_year, type='number', required=True) }}
                 </form>
             </div>
             <div class="modal-footer">
@@ -91,7 +91,7 @@
             <div class="modal-body">
                 <p>Are you sure you want to delete <strong>{{ budget.name }}</strong>?</p>
                 <form id="budget_delete-{{ budget.id }}" action="{{ url_for('budget.delete') }}" method="post">
-                    {{ form_input(id='id', label='Budget ID:', value=budget.id, type='hidden') }}
+                    {{ add_form_input(id='id', label='Budget ID:', value=budget.id, type='hidden') }}
                 </form>
             </div>
             <div class="modal-footer">
