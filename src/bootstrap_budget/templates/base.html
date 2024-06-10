@@ -1,9 +1,18 @@
 {% macro add_form_input(id, label, value='', type='text', required=False, number_step='1', placeholder='') -%}
 <div class="mb-2">
     {% if type != 'hidden' %}
-    <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
+        <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
     {% endif %}
-    <input type="{{ type }}" class="form-control" name="{{ id }}" id="{{ id }}" {% if type == 'number' -%}step="{{ number_step }}"{%- endif %} placeholder="{% if placeholder is not none -%} {{ placeholder }} {%- endif %}" value="{% if value is not none -%} {{ value }} {%- endif %}"{% if required -%} required{%- endif %}>
+    <input type="{{ type }}"
+           class="form-control"
+           name="{{ id }}"
+           id="{{ id }}"
+           {% if type == 'number' -%}
+                step="{{ number_step }}"
+           {%- endif %}
+           placeholder="{% if placeholder is not none -%} {{ placeholder }} {%- endif %}"
+           value="{% if value is not none -%} {{ value }} {%- endif %}"
+           {% if required -%} required{%- endif %}>
 </div>
 {%- endmacro %}
 <!DOCTYPE html>

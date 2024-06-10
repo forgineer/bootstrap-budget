@@ -32,7 +32,7 @@ dictConfig({
         }
     },
     'root': {
-        'level': 'INFO',
+        'level': 'DEBUG',
         'handlers': ['wsgi']
     }
 })
