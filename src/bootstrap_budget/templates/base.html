@@ -1,20 +1,21 @@
 {% macro add_form_input(id, label, value='', type='text', required=False, number_step='1', placeholder='') -%}
 <div class="mb-2">
     {% if type != 'hidden' %}
-        <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
+    <label for="{{ id }}" class="col-form-label"><strong>{{ label }}</strong></label>
     {% endif %}
     <input type="{{ type }}"
            class="form-control"
            name="{{ id }}"
            id="{{ id }}"
            {% if type == 'number' -%}
-                step="{{ number_step }}"
-           {%- endif %}
-           placeholder="{% if placeholder is not none -%} {{ placeholder }} {%- endif %}"
-           value="{% if value is not none -%} {{ value }} {%- endif %}"
-           {% if required -%} required{%- endif %}>
+    step="{{ number_step }}"
+    {%- endif %}
+    placeholder="{% if placeholder is not none -%} {{ placeholder }} {%- endif %}"
+    value="{% if value is not none -%} {{ value }} {%- endif %}"
+    {% if required -%} required{%- endif %}>
 </div>
 {%- endmacro %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -48,6 +49,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
+
                         {% macro add_admin_console_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/admin" title="Admin Console">
@@ -55,6 +57,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_user_admin_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/admin/users" title="User Administration">
@@ -62,6 +65,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_dashboard_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}"  href="/dashboard" title="Dashboard">
@@ -69,6 +73,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_budgets_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/budgets" title="Budgets">
@@ -76,6 +81,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_budget_items_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/budget-items" title="Budget Items">
@@ -83,6 +89,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_accounts_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/accounts" title="Accounts">
@@ -90,6 +97,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_transactions_nav(active=False) -%}
                         <li class="nav-item">
                             <a class="nav-link {% if active %} active {% endif %}" href="/transactions" title="Transactions">
@@ -97,6 +105,7 @@
                             </a>
                         </li>
                         {%- endmacro %}
+
                         {% macro add_user_nav(edit=True, reset=True, logout=True) -%}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -127,6 +136,7 @@
                             </ul>
                         </li>
                         {%- endmacro %}
+
                         {% block nav_items %}{% endblock %}
                     </ul>
                 </div>
@@ -156,6 +166,7 @@
             {% endif %}
         {% endwith %}
         </div>
+
         {% macro add_edit_profile_modal() -%}
         <div class="modal fade" id="updateProfileModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -186,6 +197,7 @@
             </div>
         </div>
         {%- endmacro %}
+
         {% macro add_reset_password_modal() -%}
         <div class="modal fade" id="resetPasswordModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -209,9 +221,13 @@
             </div>
         </div>
         {%- endmacro %}
-        {% block modals %}{% endblock %}
+
+        {% block view_modals %}{% endblock %}
         <main>
             {% block main_content %}{% endblock %}
         </main>
+        <script>
+            {% block view_js %}{% endblock %}
+        </script>
     </body>
 </html>
