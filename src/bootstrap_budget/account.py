@@ -21,6 +21,13 @@ def index() -> Response | str:
     return render_template('account.html', user=g.user, accounts=accounts)
 
 
+@bp.route("/<int:account_id>")
+@login_required
+def get_record(account_id: int) -> Response | str:
+    # Returns the Account object for a specific id (row)
+    return Account[account_id].to_dict()
+
+
 @bp.route("/create", methods=["POST"])
 @login_required
 def create() -> Response | str:

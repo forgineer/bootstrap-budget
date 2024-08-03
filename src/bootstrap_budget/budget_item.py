@@ -21,6 +21,45 @@ def index() -> Response | str:
     return render_template('budget-item.html', user=g.user, budget_items=budget_items)
 
 
+@bp.route("/<int:budget_item_id>")
+@login_required
+def get_record(budget_item_id: int) -> dict:
+    # Returns the Budget Item object for a specific id (row)
+    budget_item: dict = BudgetItem.get(user_id=g.user, id=budget_item_id).to_dict()
+
+    return budget_item
+
+
+@bp.route("/modal_form/<int:budget_item_id>")
+@login_required
+def get_modal_form(budget_item_id: int) -> str:
+    # Returns the Budget Item object for a specific id (row)
+    budget_item: BudgetItem = BudgetItem.get(user_id=g.user, id=budget_item_id)
+
+    modal_html: str = f"""
+        <div class="mb-2">
+            <input type="hidden" class="form-control" name="id" id="id" value="{budget_item.id}">
+        </div>
+        <div class="mb-2">
+            <label for="name" class="col-form-label"><strong>Budget Item Name:</strong></label>
+            <input type="text" class="form-control" name="name" id="name" value="{budget_item.name}" required>
+        </div>
+        <div class="mb-2">
+            <label for="description" class="col-form-label"><strong>Budget Item Description:</strong></label>
+            <input type="text" class="form-control" name="description" id="description" value="{budget_item.description}">
+        </div>
+        <div class="mb-2">
+            <label for="budget_amount" class="col-form-label"><strong>Budget Amount:</strong></label>
+            <input type="number" class="form-control" name="budget_amount" id="budget_amount" step="0.01" value="{budget_item.budget_amount}" required>
+        </div>
+        <div class="mb-2">
+            <label for="sequence_order" class="col-form-label"><strong>Budget Item Sequence:</strong></label>
+            <input type="number" class="form-control" name="sequence_order" id="sequence_order" value="{budget_item.sequence_order}" required>
+        </div>
+    """
+    return modal_html
+
+
 @bp.route("/create", methods=["POST"])
 @login_required
 def create() -> Response | str:

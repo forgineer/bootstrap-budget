@@ -52,7 +52,7 @@
                 <h5 class="modal-title">MODAL TITLE GOES HERE</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div id="updateModal" class="modal-body">
                 <form id="budget_item_update" action="{{ url_for('budget_item.update') }}" method="post">
                     {{ add_form_input(id='id', label='Budget Item ID:', type='hidden') }}
                     {{ add_form_input(id='name', label='Budget Item Name:', required=True) }}
@@ -101,11 +101,9 @@
                     class="btn btn-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#updateBudgetItemModal"
-                    data-bs-record-id="{{ budget_item.id }}"
-                    data-bs-record-name="{{ budget_item.name }}"
-                    data-bs-record-description="{{ budget_item.description }}"
-                    data-bs-record-budget_amount="{{ budget_item.budget_amount }}"
-                    data-bs-record-sequence_order="{{ budget_item.sequence_order }}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                    hx-get="{{ url_for('budget_item.get_modal_form', budget_item_id=budget_item.id) }}"
+                    hx-target="#budget_item_update"
+                    hx-trigger="click"><i class="bi bi-pencil-fill"></i> Edit</button>
             <button type="button"
                     class="btn btn-danger"
                     data-bs-toggle="modal"

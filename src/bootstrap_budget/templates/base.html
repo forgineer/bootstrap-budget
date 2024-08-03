@@ -35,7 +35,6 @@
 
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-icons.min.css') }}">
-        <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
         {% block view_css %}{% endblock %}
     </head>
     <body>
@@ -226,6 +225,8 @@
         <main>
             {% block main_content %}{% endblock %}
         </main>
+        <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='htmx.min.js') }}"></script>
         <script>
             {% block view_js %}{% endblock %}
         </script>

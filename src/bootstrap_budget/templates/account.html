@@ -23,9 +23,6 @@
 
 
 {% block main_content %}
-<div class="container my-4">
-    <button type="button" data-bs-toggle="modal" data-bs-target="#createAccountModal" class="btn btn-primary">+ Add New Account</button>
-</div>
 <div class="modal fade" id="createAccountModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -49,17 +46,7 @@
         </div>
     </div>
 </div>
-
-{% for account in accounts %}
-<div class="container my-4">
-    <a href="#" data-bs-toggle="modal" data-bs-target="#updateAccountModal-{{ account.id }}" title="{{ account.name }}">
-        <div class="p-5 bg-body-tertiary border rounded-3">
-            <h1 class="text-body-emphasis">{{ account.name }}</h1>
-            <p>{{ account.description }}</p>
-        </div>
-    </a>
-</div>
-<div class="modal fade" id="updateAccountModal-{{ account.id }}" tabindex="-1">
+<div class="modal fade" id="updateAccountModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -67,7 +54,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="account_update-{{ account.id }}" action="{{ url_for('account.update') }}" method="post">
+                <form id="account_update" action="{{ url_for('account.update') }}" method="post">
                     {{ add_form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
                     {{ add_form_input(id='name', label='Account Name:', value=account.name, required=True) }}
                     {{ add_form_input(id='description', label='Account Description:', value=account.description) }}
@@ -77,32 +64,59 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger pull-left" data-bs-toggle="modal" data-bs-target="#deleteAccountModal-{{ account.id }}">Delete</button>
+                <button type="button" class="btn btn-danger pull-left" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary" form="account_update-{{ account.id }}">Save</button>
+                <button type="submit" class="btn btn-primary" form="account_update">Save</button>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="deleteAccountModal-{{ account.id }}" tabindex="-1">
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-circle-fill"></i> Delete {{ account.name }}</h5>
+                <h5 class="modal-title text-danger">DELETE ACCOUNT NAME GOES HERE</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete <strong>{{ account.name }}</strong>?</p>
-                <form id="account_delete-{{ account.id }}" action="{{ url_for('account.delete') }}" method="post">
-                    {{ add_form_input(id='id', label='Account ID:', value=account.id, type='hidden') }}
+                <p>Are you sure you want to delete <strong>BUDGET NAME GOES HERE</strong>?</p>
+                <form id="account_delete" action="{{ url_for('account.delete') }}" method="post">
+                    {{ add_form_input(id='id', label='Account ID:', type='hidden') }}
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary" form="account_delete-{{ account.id }}">Yes</button>
+                <button type="submit" class="btn btn-primary" form="account_delete">Yes</button>
             </div>
         </div>
     </div>
 </div>
-{% endfor %}
+<div class="container my-4">
+    <button type="button" data-bs-toggle="modal" data-bs-target="#createAccountModal" class="btn btn-primary">+ Add New Account</button>
+</div>
+<div class="container my-4">
+    {% for account in accounts %}
+    <div class="container my-4">
+        <div class="p-3 bg-body-tertiary border rounded-3">
+            <h1 class="text-body-emphasis">{{ account.name }}</h1>
+            <p>{{ account.description }}</p>
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateBudgetItemModal"
+                    data-bs-record-id="{{ budget_item.id }}"
+                    data-bs-record-name="{{ budget_item.name }}"
+                    data-bs-record-description="{{ budget_item.description }}"
+                    data-bs-record-budget_amount="{{ budget_item.budget_amount }}"
+                    data-bs-record-sequence_order="{{ budget_item.sequence_order }}"><i class="bi bi-pencil-fill"></i> Edit</button>
+            <button type="button"
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteBudgetItemModal"
+                    data-bs-record-id="{{ budget_item.id }}"><i class="bi bi-x-octagon-fill"></i> Delete</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
 {% endblock %}
